@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Graph>
+    <Vertex name="A" x="975" y="204">
+        <VertexLink link="B"/>
+        <VertexLink link="GH"/>
+        <VertexLink link="IJKL"/>
+        <VertexLink link="DEF"/>
+        <VertexLink link="MN"/>
+    </Vertex>
+    <Vertex name="B" x="1022" y="132">
+        <VertexLink link="A"/>
+    </Vertex>
+    <Vertex name="GH" x="1062" y="583">
+        <VertexLink link="A"/>
+        <VertexLink link="BC"/>
+        <VertexLink link="DEF"/>
+        <VertexLink link="IJKL"/>
+        <VertexLink link="TUV"/>
+        <VertexLink link="MN"/>
+    </Vertex>
+    <Vertex name="IJKL" x="1489" y="833">
+        <VertexLink link="A"/>
+        <VertexLink link="GH"/>
+        <VertexLink link="DEF"/>
+        <VertexLink link="BC"/>
+    </Vertex>
+    <Vertex name="DEF" x="443" y="939">
+        <VertexLink link="A"/>
+        <VertexLink link="GH"/>
+        <VertexLink link="IJKL"/>
+        <VertexLink link="BC"/>
+        <VertexLink link="TUV"/>
+    </Vertex>
+    <Vertex name="MN" x="731" y="324">
+        <VertexLink link="A"/>
+        <VertexLink link="GH"/>
+        <VertexLink link="BC"/>
+    </Vertex>
+    <Vertex name="BC" x="873" y="756">
+        <VertexLink link="GH"/>
+        <VertexLink link="IJKL"/>
+        <VertexLink link="DEF"/>
+        <VertexLink link="MN"/>
+        <VertexLink link="AB"/>
+    </Vertex>
+    <Vertex name="TUV" x="499" y="341">
+        <VertexLink link="GH"/>
+        <VertexLink link="DEF"/>
+        <VertexLink link="AB"/>
+    </Vertex>
+    <Vertex name="AB" x="615" y="621">
+        <VertexLink link="BC"/>
+        <VertexLink link="TUV"/>
+    </Vertex>
+</Graph>

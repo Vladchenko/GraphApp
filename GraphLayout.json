@@ -1,0 +1,187 @@
+{
+  "vertices": [
+    {
+      "name": "A",
+      "x": 975,
+      "y": 204
+    },
+    {
+      "name": "B",
+      "x": 1022,
+      "y": 132
+    },
+    {
+      "name": "GH",
+      "x": 1062,
+      "y": 583
+    },
+    {
+      "name": "IJKL",
+      "x": 1489,
+      "y": 833
+    },
+    {
+      "name": "DEF",
+      "x": 443,
+      "y": 939
+    },
+    {
+      "name": "MN",
+      "x": 731,
+      "y": 324
+    },
+    {
+      "name": "BC",
+      "x": 873,
+      "y": 756
+    },
+    {
+      "name": "TUV",
+      "x": 499,
+      "y": 341
+    },
+    {
+      "name": "AB",
+      "x": 615,
+      "y": 621
+    }
+  ],
+  "links": [
+    {
+      "vertex1": "A",
+      "vertex2": "B"
+    },
+    {
+      "vertex1": "A",
+      "vertex2": "GH"
+    },
+    {
+      "vertex1": "A",
+      "vertex2": "IJKL"
+    },
+    {
+      "vertex1": "A",
+      "vertex2": "DEF"
+    },
+    {
+      "vertex1": "A",
+      "vertex2": "MN"
+    },
+    {
+      "vertex1": "B",
+      "vertex2": "A"
+    },
+    {
+      "vertex1": "GH",
+      "vertex2": "A"
+    },
+    {
+      "vertex1": "GH",
+      "vertex2": "BC"
+    },
+    {
+      "vertex1": "GH",
+      "vertex2": "DEF"
+    },
+    {
+      "vertex1": "GH",
+      "vertex2": "IJKL"
+    },
+    {
+      "vertex1": "GH",
+      "vertex2": "TUV"
+    },
+    {
+      "vertex1": "GH",
+      "vertex2": "MN"
+    },
+    {
+      "vertex1": "IJKL",
+      "vertex2": "A"
+    },
+    {
+      "vertex1": "IJKL",
+      "vertex2": "GH"
+    },
+    {
+      "vertex1": "IJKL",
+      "vertex2": "DEF"
+    },
+    {
+      "vertex1": "IJKL",
+      "vertex2": "BC"
+    },
+    {
+      "vertex1": "DEF",
+      "vertex2": "A"
+    },
+    {
+      "vertex1": "DEF",
+      "vertex2": "GH"
+    },
+    {
+      "vertex1": "DEF",
+      "vertex2": "IJKL"
+    },
+    {
+      "vertex1": "DEF",
+      "vertex2": "BC"
+    },
+    {
+      "vertex1": "DEF",
+      "vertex2": "TUV"
+    },
+    {
+      "vertex1": "MN",
+      "vertex2": "A"
+    },
+    {
+      "vertex1": "MN",
+      "vertex2": "GH"
+    },
+    {
+      "vertex1": "MN",
+      "vertex2": "BC"
+    },
+    {
+      "vertex1": "BC",
+      "vertex2": "GH"
+    },
+    {
+      "vertex1": "BC",
+      "vertex2": "IJKL"
+    },
+    {
+      "vertex1": "BC",
+      "vertex2": "DEF"
+    },
+    {
+      "vertex1": "BC",
+      "vertex2": "MN"
+    },
+    {
+      "vertex1": "BC",
+      "vertex2": "AB"
+    },
+    {
+      "vertex1": "TUV",
+      "vertex2": "GH"
+    },
+    {
+      "vertex1": "TUV",
+      "vertex2": "DEF"
+    },
+    {
+      "vertex1": "TUV",
+      "vertex2": "AB"
+    },
+    {
+      "vertex1": "AB",
+      "vertex2": "BC"
+    },
+    {
+      "vertex1": "AB",
+      "vertex2": "TUV"
+    }
+  ]
+}
