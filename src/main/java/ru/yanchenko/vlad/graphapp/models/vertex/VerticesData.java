@@ -4,7 +4,15 @@ import ru.yanchenko.vlad.graphapp.models.presentation.VertexPolarCoordinate;
 
 import java.util.List;
 
-// Domain data only - no UI state
+/**
+ * Legacy data container for graph vertices and UI state.
+ * 
+ * @deprecated This class is deprecated in favor of the new service architecture:
+ * - Use GraphDomainService for domain data (vertices, edges)
+ * - Use GraphUiStateService for UI state (links, polar coordinates)
+ * - Use VerticesDataFacade for backward compatibility
+ */
+@Deprecated
 public class VerticesData {
     private final List<Vertex> vertices;
     private final List<VertexLink> verticesLinks;

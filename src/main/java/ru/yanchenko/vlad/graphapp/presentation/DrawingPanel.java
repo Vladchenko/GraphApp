@@ -1,12 +1,17 @@
 package ru.yanchenko.vlad.graphapp.presentation;
 
+import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse.MouseActionManager;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.RefreshService;
 import ru.yanchenko.vlad.graphapp.geometry.Geometry;
 import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.UiColors;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.*;
+import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
+import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
+import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
+import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
+import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,17 +31,20 @@ public class DrawingPanel extends JPanel {
 
     private final MouseActionManager mouseActionManager;
     private final ScreenData screenData;
-    private final VerticesData verticesData; // Domain data
+    private final GraphDomainService graphService; // Domain service
+    private final GraphUiStateService uiStateService; // UI state service
     private final GraphUiState uiState; // UI state
 
     public DrawingPanel(ScreenData screenData,
                         MouseActionManager mouseActionManager,
-                        VerticesData verticesData,
+                        GraphDomainService graphService,
+                        GraphUiStateService uiStateService,
                         GraphUiState uiState,
                         RefreshService refreshService) {
         this.uiState = uiState;
         this.screenData = screenData;
-        this.verticesData = verticesData;
+        this.graphService = graphService;
+        this.uiStateService = uiStateService;
         this.mouseActionManager = mouseActionManager;
         
         // Set up the refresh callback
@@ -50,6 +58,7 @@ public class DrawingPanel extends JPanel {
         // Clear canvas
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
+
 
         // Configure rendering hints
         configureRenderingHints(g2);
@@ -87,8 +96,8 @@ public class DrawingPanel extends JPanel {
      */
     private void drawEdges(Graphics2D g2) {
         g2.setColor(UiColors.VERTEX_LINKS_COLOR);
-        List<VertexLink> verticesLinks = verticesData.getVerticesLinks();
-        List<Vertex> vertices = verticesData.getVertices();
+        List<VertexLink> verticesLinks = graphService.convertEdgesToLinks();
+        List<Vertex> vertices = graphService.getCurrentGraph().getVertices();
 
         for (VertexLink link : verticesLinks) {
             drawEdge(g2, link, vertices);
@@ -155,7 +164,7 @@ public class DrawingPanel extends JPanel {
      * Draw the possible link being created (UI state).
      */
     private void drawPossibleLink(Graphics g) {
-        VertexPossibleLink link = verticesData.getVertexPossibleLink();
+        VertexPossibleLink link = uiStateService.getUiData().getPossibleLink();
         Graphics2D g2 = (Graphics2D) g;
         if (mouseActionManager.isRightMouseButton()) {
             g2.setColor(Color.BLACK);
@@ -177,7 +186,7 @@ public class DrawingPanel extends JPanel {
      * Draw all vertices.
      */
     private void drawVertices(Graphics2D g2) {
-        List<Vertex> vertices = verticesData.getVertices();
+        List<Vertex> vertices = graphService.getCurrentGraph().getVertices();
         for (int i = 0; i < vertices.size(); i++) {
             Vertex vertex = vertices.get(i);
             boolean isSelected = i == uiState.getSelectedVertexIndex();
@@ -390,9 +399,9 @@ public class DrawingPanel extends JPanel {
         g2.setFont(new Font("Arial", Font.PLAIN, 10));
 
         int y = 40;
-        g2.drawString("Vertices: " + verticesData.getVertices().size(), 10, y);
+        g2.drawString("Vertices: " + graphService.getCurrentGraph().getVertices().size(), 10, y);
         y += 15;
-        g2.drawString("Edges: " + verticesData.getVerticesLinks().size(), 10, y);
+        g2.drawString("Edges: " + graphService.convertEdgesToLinks().size(), 10, y);
         y += 15;
         g2.drawString("Selected: " + uiState.getSelectedVertexIndex(), 10, y);
         y += 15;

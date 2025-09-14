@@ -2,7 +2,6 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -26,11 +25,9 @@ public class AddVertexAction extends GraphAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VerticesData verticesData = context.getVerticesData();
-
         if (!uiState.isEditingVertex()) {
             // Clear any existing selection
-            clearSelection(verticesData);
+            clearSelection();
 
             // Set UI state for vertex addition
             uiState.setAddingVertex(true);
@@ -59,9 +56,8 @@ public class AddVertexAction extends GraphAction {
     /**
      * Clear vertex selection in domain data.
      */
-    private void clearSelection(VerticesData verticesData) {
-        // Clear any ongoing link creation
-        verticesData.getVertexLink().setLink1(-1);
-        verticesData.getVertexLink().setLink2(-1);
+    private void clearSelection() {
+        // Clear any ongoing link creation using the UI state service
+        context.getUiStateService().setCurrentLink(new ru.yanchenko.vlad.graphapp.models.vertex.VertexLink());
     }
 }

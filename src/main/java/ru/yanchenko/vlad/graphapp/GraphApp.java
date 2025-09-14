@@ -2,12 +2,13 @@ package ru.yanchenko.vlad.graphapp;
 
 import ru.yanchenko.vlad.graphapp.di.DaggerGraphAppComponent;
 import ru.yanchenko.vlad.graphapp.di.GraphAppComponent;
+import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key.ActionManager;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse.MouseActionManager;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexPopulationService;
 import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
+import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingPanel;
 
 import javax.swing.*;
@@ -19,14 +20,16 @@ public class GraphApp {
         ScreenData screenData = daggerComponent.getScreenData();
         JFrame drawingFrame = daggerComponent.getDrawingFrame();
         GraphUiState uiState = daggerComponent.getGraphUiState();
+        GraphDomainService graphService = daggerComponent.getGraphDomainService();
+        GraphUiStateService uiStateService = daggerComponent.getGraphUiStateService();
         DrawingPanel drawingPanel = daggerComponent.getDrawingPanel();
-        VerticesData verticesData = daggerComponent.getVerticesData();
         ActionManager actionManager = daggerComponent.getActionManager();
         KeyListener textInputListener = daggerComponent.getTextInputListener();
         MouseActionManager mouseActionManager = daggerComponent.getMouseActionManager();
         VertexPopulationService vertexPopulationService = daggerComponent.getVertexPopulationService();
 
-        vertexPopulationService.populateVertices(verticesData, uiState);
+        // Use new service architecture for vertex population
+        vertexPopulationService.populateVertices(graphService, uiStateService, uiState);
         drawingPanel.setBackground(screenData.getWindowBackgroundColor());
         drawingPanel.setFocusable(true);
         drawingPanel.addKeyListener(textInputListener);

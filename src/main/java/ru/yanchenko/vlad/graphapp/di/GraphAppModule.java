@@ -3,6 +3,7 @@ package ru.yanchenko.vlad.graphapp.di;
 import dagger.Module;
 import dagger.Provides;
 import ru.yanchenko.vlad.graphapp.AppConfig;
+import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key.*;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse.MouseActionManager;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.EditActionContext;
@@ -17,10 +18,10 @@ import ru.yanchenko.vlad.graphapp.listeners.TextInputListener;
 import ru.yanchenko.vlad.graphapp.models.PopulationKind;
 import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
+import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
 import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
+import ru.yanchenko.vlad.graphapp.models.vertex.VerticesDataFacade;
 import ru.yanchenko.vlad.graphapp.persistence.JsonPersistence;
 import ru.yanchenko.vlad.graphapp.persistence.Persistable;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingPanel;
@@ -31,7 +32,6 @@ import javax.inject.Singleton;
 import javax.swing.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseMotionListener;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -72,17 +72,17 @@ public class GraphAppModule {
         return new JsonPersistence();   //XMLPersistence();
     }
 
-    @Provides
-    @Singleton
-    public VerticesData provideVerticesData() {
-        return new VerticesData(
-                new ArrayList<>(),
-                new VertexLink(),
-                new VertexPossibleLink(),
-                new ArrayList<>(),
-                new ArrayList<>()
-        );
-    }
+//    @Provides
+//    @Singleton
+//    public VerticesData provideVerticesData() {
+//        return new VerticesData(
+//                new ArrayList<>(),
+//                new VertexLink(),
+//                new VertexPossibleLink(),
+//                new ArrayList<>(),
+//                new ArrayList<>()
+//        );
+//    }
 
     @Provides
     @Singleton
@@ -98,19 +98,19 @@ public class GraphAppModule {
                                                                     VertexCreationService vertexCreationService) {
         VertexPopulationStrategy strategy = null;
         switch (populationKind) {
-            case PopulationKind.FIXED_FILE: {
+            case FIXED_FILE: {
                 strategy = new FixedFileStrategy(persistable);
                 break;
             }
-            case PopulationKind.CIRCULAR_FILE: {
+            case CIRCULAR_FILE: {
                 strategy = new CircularFileStrategy(persistable, layoutStrategiesList);
                 break;
             }
-            case PopulationKind.HARDCODED_SAMPLE_A: {
+            case HARDCODED_SAMPLE_A: {
                 strategy = new HardcodedSampleAStrategy(vertexCreationService);
                 break;
             }
-            case PopulationKind.HARDCODED_SAMPLE_B: {
+            case HARDCODED_SAMPLE_B: {
                 strategy = new HardcodedSampleBStrategy(vertexCreationService);
                 break;
             }
@@ -159,10 +159,11 @@ public class GraphAppModule {
     @Singleton
     public DrawingPanel provideDrawingPanel(GraphUiState uiState,
                                             ScreenData screenData,
-                                            VerticesData verticesData,
+                                            GraphDomainService graphService,
+                                            GraphUiStateService uiStateService,
                                             MouseActionManager mouseActionManager,
                                             RefreshService refreshService) {
-        return new DrawingPanel(screenData, mouseActionManager, verticesData, uiState, refreshService);
+        return new DrawingPanel(screenData, mouseActionManager, graphService, uiStateService, uiState, refreshService);
     }
 
     @Provides
@@ -198,16 +199,20 @@ public class GraphAppModule {
     public FileActionContext provideFileActionContext(Persistable persistable,
                                                       VerticesData verticesData,
                                                       RefreshService refreshService,
-                                                      GraphUiState uiState) {
-        return new FileActionContext(persistable, verticesData, refreshService, uiState);
+                                                      GraphUiState uiState,
+                                                      GraphDomainService graphService,
+                                                      GraphUiStateService uiStateService) {
+        return new FileActionContext(persistable, verticesData, refreshService, uiState, graphService, uiStateService);
     }
 
     @Provides
     @Singleton
-    public GraphActionContext provideGraphActionContext(VerticesData verticesData,
+    public GraphActionContext provideGraphActionContext(GraphDomainService graphService,
+                                                        GraphUiStateService uiStateService,
+                                                        VerticesData verticesData,
                                                         RefreshService refreshService,
                                                         PopulationKind populationKind) {
-        return new GraphActionContext(verticesData, refreshService, populationKind);
+        return new GraphActionContext(graphService, uiStateService, verticesData, refreshService, populationKind);
     }
 
     @Provides
@@ -324,5 +329,32 @@ public class GraphAppModule {
     @Singleton
     public RefreshService provideRefreshService() {
         return new RefreshService();
+    }
+
+    // Add new domain service providers
+    @Provides
+    @Singleton
+    public GraphDomainService provideGraphDomainService() {
+        return new GraphDomainService();
+    }
+
+    @Provides
+    @Singleton
+    public GraphUiStateService provideGraphUiStateService(GraphUiState uiState) {
+        return new GraphUiStateService(uiState);
+    }
+
+    @Provides
+    @Singleton
+    public VerticesDataFacade provideVerticesDataFacade(GraphDomainService graphService,
+                                                        GraphUiStateService uiStateService) {
+        return new VerticesDataFacade(graphService, uiStateService);
+    }
+
+    // Update the existing VerticesData provider to use the facade
+    @Provides
+    @Singleton
+    public VerticesData provideVerticesData(VerticesDataFacade facade) {
+        return facade.asVerticesData();
     }
 }

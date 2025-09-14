@@ -3,7 +3,6 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 import java.awt.event.ActionEvent;
 import java.util.List;
@@ -27,8 +26,6 @@ public class EditVertexAction extends GraphAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VerticesData verticesData = context.getVerticesData();
-
         if (!canStartEditing()) {
             LOGGER.warning("Cannot start vertex editing - no selection or operation in progress");
             return;
@@ -39,7 +36,7 @@ public class EditVertexAction extends GraphAction {
             clearOtherOperations();
 
             // Start editing mode
-            startEditingMode(verticesData);
+            startEditingMode();
 
             LOGGER.info("Started vertex editing mode for vertex at index: " + uiState.getSelectedVertexIndex());
             context.getRefreshService().refresh();
@@ -76,8 +73,8 @@ public class EditVertexAction extends GraphAction {
     /**
      * Start editing mode for the selected vertex.
      */
-    private void startEditingMode(VerticesData verticesData) {
-        List<Vertex> vertices = verticesData.getVertices();
+    private void startEditingMode() {
+        List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
         int index = uiState.getSelectedVertexIndex();
 
         if (index >= 0 && index < vertices.size()) {

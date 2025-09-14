@@ -28,8 +28,8 @@ public class SaveAction extends GraphAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
-            // Save graph data to file
-            context.getPersistable().saveToFile(context.getVerticesData());
+            // Save graph data to file using new service architecture
+            context.getPersistable().saveToFile(context.getGraphService());
 
             LOGGER.info("Graph saved successfully to file");
             context.getRefreshService().refresh();

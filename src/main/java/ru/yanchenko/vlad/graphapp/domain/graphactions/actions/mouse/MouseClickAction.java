@@ -5,7 +5,6 @@ import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContex
 import ru.yanchenko.vlad.graphapp.geometry.Geometry;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -26,8 +25,7 @@ public class MouseClickAction extends GraphAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VerticesData verticesData = context.getVerticesData();
-        List<Vertex> vertices = verticesData.getVertices();
+        List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
 
         // Handle vertex selection
         for (int i = 0; i < vertices.size(); i++) {
@@ -36,7 +34,7 @@ public class MouseClickAction extends GraphAction {
                     mouseEvent.getX(), mouseEvent.getY()) <= vertex.getRadius()) {
                 // Update UI state for selection
                 uiState.setSelectedVertexIndex(i);
-                verticesData.getVertexLink().setLink1(i);
+                context.getUiStateService().setCurrentLink(new ru.yanchenko.vlad.graphapp.models.vertex.VertexLink(i, -1));
             }
         }
         context.getRefreshService().refresh();

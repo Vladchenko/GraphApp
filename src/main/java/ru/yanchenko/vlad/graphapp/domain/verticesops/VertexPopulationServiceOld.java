@@ -29,7 +29,7 @@ public class VertexPopulationServiceOld {
 
     public void populateVertices(PopulationKind populationKind, VerticesData verticesData, GraphUiState uiState) {
         switch (populationKind) {
-            case PopulationKind.HARDCODED_SAMPLE_A: {
+            case HARDCODED_SAMPLE_A: {
                 vertexCreationService.addVertexAtPosition("1", 100, 100, verticesData);
                 vertexCreationService.addVertexAtPosition("12", 200, 200, verticesData);
                 vertexCreationService.addVertexAtPosition("123", 300, 300, verticesData);
@@ -41,7 +41,7 @@ public class VertexPopulationServiceOld {
                 vertexCreationService.addVertexAtPosition("1234567890 abcdefghijk lmnopqrstuv", 1150, 650, verticesData);
                 break;
             }
-            case PopulationKind.HARDCODED_SAMPLE_B: {
+            case HARDCODED_SAMPLE_B: {
                 vertexCreationService.addVertexByName("a", verticesData);
                 vertexCreationService.addVertexByName("bc", verticesData);
                 vertexCreationService.addVertexByName("def", verticesData);
@@ -59,7 +59,7 @@ public class VertexPopulationServiceOld {
                 }
                 break;
             }
-            case PopulationKind.CIRCULAR_FILE: {
+            case CIRCULAR_FILE: {
                 try {
                     persistable.loadFromFile(verticesData);
                 } catch (ParserConfigurationException ex) {
@@ -71,7 +71,7 @@ public class VertexPopulationServiceOld {
                 uiState.setAddingVertex(false);
                 break;
             }
-            case PopulationKind.FIXED_FILE: {
+            case FIXED_FILE: {
                 try {
                     persistable.loadFromFile(verticesData);
                 } catch (ParserConfigurationException ex) {

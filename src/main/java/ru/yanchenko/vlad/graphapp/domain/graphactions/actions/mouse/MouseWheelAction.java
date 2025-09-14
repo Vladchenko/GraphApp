@@ -4,7 +4,6 @@ import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key.GraphAction;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexRotationService;
 import ru.yanchenko.vlad.graphapp.models.presentation.VertexPolarCoordinate;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseWheelEvent;
@@ -29,8 +28,7 @@ public class MouseWheelAction extends GraphAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VerticesData verticesData = context.getVerticesData();
-        List<VertexPolarCoordinate> polarCoordinates = verticesData.getVerticesPolarCoordinates();
+        List<VertexPolarCoordinate> polarCoordinates = context.getUiStateService().getUiData().getPolarCoordinates();
 
         if (!polarCoordinates.isEmpty()) {
             double rotation = mouseWheelEvent.getPreciseWheelRotation(); // or getWheelRotation()
@@ -41,7 +39,7 @@ public class MouseWheelAction extends GraphAction {
 
             vertexRotationService.rotateVertices(
                     increment,
-                    verticesData.getVertices(),
+                    context.getGraphService().getCurrentGraph().getVertices(),
                     polarCoordinates
             );
         }

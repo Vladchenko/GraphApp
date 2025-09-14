@@ -1,16 +1,20 @@
 package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 
+import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexCreationService;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexLayoutService;
 import ru.yanchenko.vlad.graphapp.models.PopulationKind;
+import ru.yanchenko.vlad.graphapp.models.domain.Graph;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.presentation.VertexPolarCoordinate;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
+import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
+import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -38,24 +42,25 @@ public class ConfirmAction extends GraphAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VerticesData verticesData = context.getVerticesData();
+        // NEW: Use services directly
+        GraphDomainService graphService = context.getGraphService();
+        GraphUiStateService uiStateService = context.getUiStateService();
 
         try {
             // Handle vertex editing
             if (uiState.isEditingVertex() && !uiState.getEditBuffer().isEmpty()) {
-                confirmVertexEditing(verticesData);
+                confirmVertexEditing(graphService, uiStateService);
             }
 
             // Handle vertex addition
             if (uiState.isAddingVertex() && !uiState.getEditBuffer().isEmpty()) {
-                confirmVertexAddition(verticesData);
+                confirmVertexAddition(graphService, uiStateService);
             }
 
             context.getRefreshService().refresh();
 
         } catch (Exception ex) {
             LOGGER.log(java.util.logging.Level.SEVERE, "Error confirming operation", ex);
-            // Reset to safe state
             resetToSafeState();
         }
     }
@@ -67,14 +72,23 @@ public class ConfirmAction extends GraphAction {
     }
 
     /**
-     * Confirm vertex editing operation.
+     * NEW: Confirm vertex editing using services directly.
      */
-    private void confirmVertexEditing(VerticesData verticesData) {
+    private void confirmVertexEditing(GraphDomainService graphService, GraphUiStateService uiStateService) {
         String name = sanitize(uiState.getEditBuffer());
         int index = uiState.getSelectedVertexIndex();
-
-        if (index >= 0 && index < verticesData.getVertices().size()) {
-            verticesData.getVertices().get(index).setVertexName(name);
+        
+        List<Vertex> vertices = graphService.getCurrentGraph().getVertices();
+        if (index >= 0 && index < vertices.size()) {
+            // Create new vertex with updated name
+            Vertex oldVertex = vertices.get(index);
+            Vertex newVertex = new Vertex((int) oldVertex.getX(), (int) oldVertex.getY(), oldVertex.getRadius(), name);
+            
+            // Update the graph
+            List<Vertex> newVertices = new ArrayList<>(vertices);
+            newVertices.set(index, newVertex);
+            graphService.updateGraph(new Graph(newVertices, graphService.getCurrentGraph().getEdges()));
+            
             uiState.setEditingVertex(false);
             uiState.setEditBuffer("");
             maybeRelayout();
@@ -84,13 +98,13 @@ public class ConfirmAction extends GraphAction {
     }
 
     /**
-     * Confirm vertex addition operation.
+     * NEW: Confirm vertex addition using services directly.
      */
-    private void confirmVertexAddition(VerticesData verticesData) {
+    private void confirmVertexAddition(GraphDomainService graphService, GraphUiStateService uiStateService) {
         String name = sanitize(uiState.getEditBuffer());
 
-        vertexCreationService.addVertexAtCenter(name, verticesData);
-        verticesData.getVerticesPolarCoordinates().add(new VertexPolarCoordinate());
+        vertexCreationService.addVertexAtCenter(name, graphService);
+        uiStateService.updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
         uiState.setAddingVertex(false);
         uiState.setEditBuffer("");
         maybeRelayout();
@@ -99,12 +113,12 @@ public class ConfirmAction extends GraphAction {
     }
 
     /**
-     * Relayout vertices if needed based on population kind.
+     * NEW: Relayout using services directly.
      */
     private void maybeRelayout() {
         PopulationKind kind = context.getPopulationKind();
         if (kind == PopulationKind.CIRCULAR_FILE || kind == PopulationKind.HARDCODED_SAMPLE_B) {
-            vertexLayoutService.layoutVertices(context.getVerticesData().getVertices());
+            vertexLayoutService.layoutVertices(context.getGraphService().getCurrentGraph().getVertices());
         }
     }
 

@@ -6,7 +6,6 @@ import ru.yanchenko.vlad.graphapp.geometry.Geometry;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -27,10 +26,11 @@ public class MouseDragAction extends GraphAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VerticesData verticesData = context.getVerticesData();
-        List<Vertex> vertices = verticesData.getVertices();
-        int chosenVertex = verticesData.getVertexLink().getLink1();
-        VertexLink vertexLink = verticesData.getVertexLink();
+        // NEW: Use services directly instead of legacy VerticesData
+        List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
+        ru.yanchenko.vlad.graphapp.models.vertex.VertexLink currentLink = context.getUiStateService().getUiData().getCurrentLink();
+        int chosenVertex = currentLink.getLink1();
+        VertexLink vertexLink = currentLink;
 
         boolean ctrlDown = mouseEvent.isControlDown() || mouseEvent.isMetaDown();
 
@@ -49,13 +49,13 @@ public class MouseDragAction extends GraphAction {
                     mouseEvent.getPoint().x, mouseEvent.getPoint().y);
 
             // Set first terminator coordinates
-            verticesData.getVertexPossibleLink().setX1(
+            context.getUiStateService().getUiData().getPossibleLink().setX1(
                     (int) (vertices.get(vertexLink.getLink1()).getX() +
                             Math.cos(angle) * (vertices.get(vertexLink.getLink1()).getRadius() +
                                     uiState.getVertexLinkMargin())) // Use UI state for margin
             );
 
-            verticesData.getVertexPossibleLink().setY1(
+            context.getUiStateService().getUiData().getPossibleLink().setY1(
                     (int) (vertices.get(vertexLink.getLink1()).getY() -
                             Math.sin(angle) * (vertices.get(vertexLink.getLink1()).getRadius() +
                                     uiState.getVertexLinkMargin())) // Use UI state for margin
@@ -66,16 +66,16 @@ public class MouseDragAction extends GraphAction {
                     vertices.get(vertexLink.getLink1()).getRadius() + uiState.getVertexLinkMargin()) {
 
                 // Set second terminator to same as first
-                verticesData.getVertexPossibleLink().setX2(
-                        verticesData.getVertexPossibleLink().getX1()
+                context.getUiStateService().getUiData().getPossibleLink().setX2(
+                        context.getUiStateService().getUiData().getPossibleLink().getX1()
                 );
-                verticesData.getVertexPossibleLink().setY2(
-                        verticesData.getVertexPossibleLink().getY1()
+                context.getUiStateService().getUiData().getPossibleLink().setY2(
+                        context.getUiStateService().getUiData().getPossibleLink().getY1()
                 );
             } else {
                 // Set second terminator to mouse position
-                verticesData.getVertexPossibleLink().setX2(mouseEvent.getX());
-                verticesData.getVertexPossibleLink().setY2(mouseEvent.getY());
+                context.getUiStateService().getUiData().getPossibleLink().setX2(mouseEvent.getX());
+                context.getUiStateService().getUiData().getPossibleLink().setY2(mouseEvent.getY());
             }
 
             // Check for intersection with other vertices
@@ -85,34 +85,34 @@ public class MouseDragAction extends GraphAction {
                         mouseEvent.getX(), mouseEvent.getY()) <=
                         vertex.getRadius() + uiState.getVertexLinkMargin()) {
 
-                    if (i != verticesData.getVertexLink().getLink1()) {
+                    if (i != currentLink.getLink1()) {
                         // Calculate angle to target vertex
                         double angle2 = Geometry.computeAngle(subjectX1, subjectY1,
                                 vertex.getX(), vertex.getY()) + Math.PI;
 
                         // Set second terminator to target vertex
-                        verticesData.getVertexPossibleLink().setX2(
+                        context.getUiStateService().getUiData().getPossibleLink().setX2(
                                 (int) (vertex.getX() + Math.cos(angle2) *
                                         (vertex.getRadius() + uiState.getVertexLinkMargin()))
                         );
 
-                        verticesData.getVertexPossibleLink().setY2(
+                        context.getUiStateService().getUiData().getPossibleLink().setY2(
                                 (int) (vertex.getY() - Math.sin(angle2) *
                                         (vertex.getRadius() + uiState.getVertexLinkMargin()))
                         );
 
                         // Recalculate first terminator for stability
                         angle = Geometry.computeAngle(subjectX1, subjectY1,
-                                verticesData.getVertexPossibleLink().getX2(),
-                                verticesData.getVertexPossibleLink().getY2());
+                                context.getUiStateService().getUiData().getPossibleLink().getX2(),
+                                context.getUiStateService().getUiData().getPossibleLink().getY2());
 
-                        verticesData.getVertexPossibleLink().setX1(
+                        context.getUiStateService().getUiData().getPossibleLink().setX1(
                                 (int) (vertices.get(vertexLink.getLink1()).getX() +
                                         Math.cos(angle) * (vertices.get(vertexLink.getLink1()).getRadius() +
                                                 uiState.getVertexLinkMargin()))
                         );
 
-                        verticesData.getVertexPossibleLink().setY1(
+                        context.getUiStateService().getUiData().getPossibleLink().setY1(
                                 (int) (vertices.get(vertexLink.getLink1()).getY() -
                                         Math.sin(angle) * (vertices.get(vertexLink.getLink1()).getRadius() +
                                                 uiState.getVertexLinkMargin()))

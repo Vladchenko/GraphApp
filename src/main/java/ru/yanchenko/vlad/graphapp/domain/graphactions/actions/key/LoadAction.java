@@ -2,7 +2,6 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.FileActionContext;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.presentation.VertexPolarCoordinate;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -32,8 +31,8 @@ public class LoadAction extends GraphAction {
             // Clear current state before loading
             clearCurrentState();
 
-            // Load graph data from file
-            context.getPersistable().loadFromFile(context.getVerticesData());
+            // Load graph data from file using new service architecture
+            context.getPersistable().loadFromFile(context.getGraphService());
 
             // Initialize polar coordinates for loaded vertices
             initializePolarCoordinates();
@@ -67,14 +66,8 @@ public class LoadAction extends GraphAction {
      * Initialize polar coordinates for all loaded vertices.
      */
     private void initializePolarCoordinates() {
-        // Clear existing polar coordinates
-        context.getVerticesData().getVerticesPolarCoordinates().clear();
-
-        // Add new polar coordinates for each vertex
-        int vertexCount = context.getVerticesData().getVertices().size();
-        for (int i = 0; i < vertexCount; i++) {
-            context.getVerticesData().getVerticesPolarCoordinates().add(new VertexPolarCoordinate());
-        }
+        // Update polar coordinates using the UI state service
+        context.getUiStateService().updatePolarCoordinates(context.getGraphService().getCurrentGraph().getVertices());
     }
 
     /**

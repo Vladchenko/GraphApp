@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import ru.yanchenko.vlad.graphapp.AppConfig;
+import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
+import ru.yanchenko.vlad.graphapp.models.domain.Graph;
 import ru.yanchenko.vlad.graphapp.models.presentation.VertexTextSizer;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
@@ -130,6 +133,113 @@ public class JsonPersistence implements Persistable {
             filePath = filePath + ".json";
         }
         return filePath;
+    }
+
+    /**
+     * Loads graph data from JSON file using GraphDomainService.
+     *
+     * @param graphService the graph domain service to load data into
+     */
+    @Override
+    public void loadFromFile(GraphDomainService graphService) {
+        try {
+            String filePath = getJsonFilePath();
+
+            File file = new File(filePath);
+            if (!file.exists()) {
+                LOGGER.warning("JSON file does not exist: " + filePath);
+                return;
+            }
+
+            Map<String, Object> jsonData = objectMapper.readValue(file, new TypeReference<Map<String, Object>>() {});
+            List<Vertex> vertices = new ArrayList<>();
+            List<Edge> edges = new ArrayList<>();
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> verticesList = (List<Map<String, Object>>) jsonData.get("vertices");
+            if (verticesList != null) {
+                for (Map<String, Object> vertexData : verticesList) {
+                    String name = (String) vertexData.get("name");
+                    Integer x = (Integer) vertexData.get("x");
+                    Integer y = (Integer) vertexData.get("y");
+
+                    if (name != null && x != null && y != null) {
+                        double radius = VertexTextSizer.computeRadius(VertexFont.VERTICES_FONT, name);
+                        vertices.add(new Vertex(x, y, radius, name));
+                    }
+                }
+            }
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> linksList = (List<Map<String, Object>>) jsonData.get("links");
+            if (linksList != null) {
+                for (Map<String, Object> linkData : linksList) {
+                    String vertex1Name = (String) linkData.get("vertex1");
+                    String vertex2Name = (String) linkData.get("vertex2");
+
+                    if (vertex1Name != null && vertex2Name != null) {
+                        int vertex1Index = findVertexIndexByName(vertices, vertex1Name);
+                        int vertex2Index = findVertexIndexByName(vertices, vertex2Name);
+
+                        if (vertex1Index != -1 && vertex2Index != -1) {
+                            edges.add(new Edge(vertex1Index, vertex2Index));
+                        }
+                    }
+                }
+            }
+
+            // Update the graph service with loaded data
+            graphService.updateGraph(new Graph(vertices, edges));
+
+            LOGGER.info("JSON parsing completed successfully");
+
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Error loading from JSON file", ex);
+            throw new RuntimeException("Failed to load JSON file", ex);
+        }
+    }
+
+    /**
+     * Saves graph data to JSON file using GraphDomainService.
+     *
+     * @param graphService the graph domain service to save data from
+     */
+    @Override
+    public void saveToFile(GraphDomainService graphService) {
+        try {
+            String filePath = getJsonFilePath();
+            Graph graph = graphService.getCurrentGraph();
+
+            Map<String, Object> jsonData = new HashMap<>();
+
+            List<Map<String, Object>> verticesList = new ArrayList<>();
+            for (Vertex vertex : graph.getVertices()) {
+                if (!vertex.getVertexName().isEmpty()) {
+                    Map<String, Object> vertexData = new HashMap<>();
+                    vertexData.put("name", vertex.getVertexName());
+                    vertexData.put("x", Math.round(vertex.getX()));
+                    vertexData.put("y", Math.round(vertex.getY()));
+                    verticesList.add(vertexData);
+                }
+            }
+            jsonData.put("vertices", verticesList);
+
+            List<Map<String, Object>> linksList = new ArrayList<>();
+            for (Edge edge : graph.getEdges()) {
+                Map<String, Object> linkData = new HashMap<>();
+                linkData.put("vertex1", graph.getVertices().get(edge.from()).getVertexName());
+                linkData.put("vertex2", graph.getVertices().get(edge.to()).getVertexName());
+                linksList.add(linkData);
+            }
+            jsonData.put("links", linksList);
+
+            objectMapper.writeValue(new File(filePath), jsonData);
+            LOGGER.info("JSON file saved successfully: " + filePath);
+
+        } catch (IOException ex) {
+            LOGGER.log(Level.SEVERE, "Error saving to JSON file", ex);
+            throw new RuntimeException("Failed to save JSON file", ex);
+        }
     }
 
     private int findVertexIndexByName(List<Vertex> vertices, String name) {

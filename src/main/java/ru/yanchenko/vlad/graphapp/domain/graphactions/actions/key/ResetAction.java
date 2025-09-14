@@ -3,7 +3,6 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexPopulationService;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -39,8 +38,8 @@ public class ResetAction extends GraphAction {
             // Clear all UI state
             clearUiState();
 
-            // Repopulate with initial data
-            vertexPopulationService.populateVertices(context.getVerticesData(), uiState);
+            // Repopulate with initial data using new service architecture
+            vertexPopulationService.populateVertices(context.getGraphService(), context.getUiStateService(), uiState);
 
             LOGGER.info("Graph reset successfully");
             context.getRefreshService().refresh();
@@ -58,10 +57,9 @@ public class ResetAction extends GraphAction {
     }
 
     private void clearDomainData() {
-        VerticesData verticesData = context.getVerticesData();
-        verticesData.getVerticesLinks().clear();
-        verticesData.getVertices().clear();
-        verticesData.getVerticesPolarCoordinates().clear();
+        // Clear graph data using the new service architecture
+        context.getGraphService().updateGraph(new ru.yanchenko.vlad.graphapp.models.domain.Graph(new java.util.ArrayList<>(), new java.util.ArrayList<>()));
+        context.getUiStateService().setPolarCoordinates(new java.util.ArrayList<>());
     }
 
     private void clearUiState() {

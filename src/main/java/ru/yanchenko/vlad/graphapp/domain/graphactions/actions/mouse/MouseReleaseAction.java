@@ -6,8 +6,6 @@ import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexDeletionService;
 import ru.yanchenko.vlad.graphapp.geometry.Geometry;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -36,9 +34,9 @@ public class MouseReleaseAction extends GraphAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VerticesData verticesData = context.getVerticesData();
-        List<Vertex> vertices = verticesData.getVertices();
+        List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
         int noVertexChosen = 0;
+        ru.yanchenko.vlad.graphapp.models.vertex.VertexLink currentLink = context.getUiStateService().getUiData().getCurrentLink();
 
         for (int i = 0; i < vertices.size(); i++) {
             Vertex vertex = vertices.get(i);
@@ -53,28 +51,19 @@ public class MouseReleaseAction extends GraphAction {
                 uiState.setSelectedVertexIndex(i);
 
                 // Handle link creation/deletion
-                if (verticesData.getVertexLink().getLink1() != i) {
-                    verticesData.getVertexLink().setLink2(i);
+                if (currentLink.getLink1() != i) {
+                    currentLink.setLink2(i);
 
                     if (isRightMouseButton) {
-                        // Remove link
-                        vertexDeletionService.deleteVerticesLink(
-                                verticesData.getVertexLink().getLink1(),
-                                verticesData.getVertexLink().getLink2(),
-                                verticesData.getVerticesLinks()
-                        );
+                        // Remove link using the graph service
+                        context.getGraphService().removeEdge(new ru.yanchenko.vlad.graphapp.models.domain.Edge(currentLink.getLink1(), currentLink.getLink2()));
                     } else {
-                        // Add link
-                        verticesData.getVerticesLinks().add(
-                                new VertexLink(
-                                        verticesData.getVertexLink().getLink1(),
-                                        verticesData.getVertexLink().getLink2()
-                                )
-                        );
+                        // Add link using the graph service
+                        context.getGraphService().addEdge(new ru.yanchenko.vlad.graphapp.models.domain.Edge(currentLink.getLink1(), currentLink.getLink2()));
                     }
                 } else {
                     // Clear link selection
-                    verticesData.getVertexLink().setLink1(-1);
+                    currentLink.setLink1(-1);
                 }
             } else {
                 noVertexChosen++;
@@ -82,19 +71,19 @@ public class MouseReleaseAction extends GraphAction {
 
             // Clear link selection if no second vertex chosen
             if (noVertexChosen == vertices.size()) {
-                verticesData.getVertexLink().setLink1(-1);
-                verticesData.getVertexLink().setLink2(-1);
+                currentLink.setLink1(-1);
+                currentLink.setLink2(-1);
             }
         }
 
         // Reset editing state and clear possible link
-        uiState.setEditingVertex(false); // Use UI state instead of domain data
-        verticesData.getVertexLink().setLink1(-1);
-        verticesData.getVertexLink().setLink2(-1);
-        verticesData.getVertexPossibleLink().setX1(-10);
-        verticesData.getVertexPossibleLink().setY1(-10);
-        verticesData.getVertexPossibleLink().setX2(-10);
-        verticesData.getVertexPossibleLink().setY2(-10);
+        uiState.setEditingVertex(false);
+        currentLink.setLink1(-1);
+        currentLink.setLink2(-1);
+        context.getUiStateService().getUiData().getPossibleLink().setX1(-10);
+        context.getUiStateService().getUiData().getPossibleLink().setY1(-10);
+        context.getUiStateService().getUiData().getPossibleLink().setX2(-10);
+        context.getUiStateService().getUiData().getPossibleLink().setY2(-10);
 
         context.getRefreshService().refresh();
     }

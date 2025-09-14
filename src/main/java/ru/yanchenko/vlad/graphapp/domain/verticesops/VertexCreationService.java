@@ -1,5 +1,6 @@
 package ru.yanchenko.vlad.graphapp.domain.verticesops;
 
+import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.presentation.VertexTextSizer;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
@@ -19,9 +20,32 @@ public class VertexCreationService {
 		this.vertexValidationService = vertexValidationService;
 	}
 
+	/**
+	 * Adds a vertex by name using GraphDomainService.
+	 *
+	 * @param vertexName the name of the vertex to add
+	 * @param graphService the graph domain service
+	 */
+	public void addVertexByName(String vertexName, GraphDomainService graphService) {
+		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, graphService);
+		if (canAddVertex) {
+			double radius = VertexTextSizer.computeRadius(VertexFont.VERTICES_FONT, vertexName);
+			Vertex vertex = new Vertex(0, 0, radius, vertexName);
+			graphService.addVertex(vertex);
+		}
+	}
+
+	/**
+	 * Adds a vertex by name using VerticesData.
+	 *
+	 * @param vertexName the name of the vertex to add
+	 * @param verticesData the vertices data to add the vertex to
+	 * @deprecated Use addVertexByName(String, GraphDomainService) instead
+	 */
+	@Deprecated
 	public void addVertexByName(String vertexName, VerticesData verticesData) {
-		boolean vertexAddition = vertexValidationService.isVertexExist(vertexName, verticesData);
-		if (vertexAddition) {
+		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, verticesData);
+		if (canAddVertex) {
 			double radius = VertexTextSizer.computeRadius(VertexFont.VERTICES_FONT, vertexName);
 			Vertex vertex = new Vertex(0, 0, radius, vertexName);
 			verticesData.getVertices().add(vertex);
@@ -29,11 +53,13 @@ public class VertexCreationService {
 	}
 
 	/**
-	 * Adds a vertex at the center of the screen.
+	 * Adds a vertex at the center of the screen using VerticesData.
 	 *
 	 * @param vertexName the name of the vertex to add
 	 * @param verticesData the vertices data to add the vertex to
+	 * @deprecated Use addVertexAtCenter(String, GraphDomainService) instead
 	 */
+	@Deprecated
 	public void addVertexAtCenter(String vertexName, VerticesData verticesData) {
 		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, verticesData);
 		if (canAddVertex) {
@@ -43,13 +69,31 @@ public class VertexCreationService {
 	}
 
 	/**
-	 * Adds a vertex at specified coordinates.
+	 * Adds a vertex at specified coordinates using GraphDomainService.
+	 *
+	 * @param vertexName the name of the vertex to add
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @param graphService the graph domain service
+	 */
+	public void addVertexAtPosition(String vertexName, int x, int y, GraphDomainService graphService) {
+		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, graphService);
+		if (canAddVertex) {
+			Vertex vertex = createVertexAtPosition(vertexName, x, y);
+			graphService.addVertex(vertex);
+		}
+	}
+
+	/**
+	 * Adds a vertex at specified coordinates using VerticesData.
 	 *
 	 * @param vertexName the name of the vertex to add
 	 * @param x the x coordinate
 	 * @param y the y coordinate
 	 * @param verticesData the vertices data to add the vertex to
+	 * @deprecated Use addVertexAtPosition(String, int, int, GraphDomainService) instead
 	 */
+	@Deprecated
 	public void addVertexAtPosition(String vertexName, int x, int y, VerticesData verticesData) {
 		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, verticesData);
 		if (canAddVertex) {
@@ -85,5 +129,19 @@ public class VertexCreationService {
 	private Vertex createVertexAtPosition(String vertexName, int x, int y) {
 		double radius = VertexTextSizer.computeRadius(VertexFont.VERTICES_FONT, vertexName);
 		return new Vertex(x, y, radius, vertexName);
+	}
+
+	/**
+	 * Adds a vertex at the center of the screen using GraphDomainService.
+	 *
+	 * @param vertexName the name of the vertex to add
+	 * @param graphService the graph domain service
+	 */
+	public void addVertexAtCenter(String vertexName, GraphDomainService graphService) {
+		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, graphService.getCurrentGraph().getVertices());
+		if (canAddVertex) {
+			Vertex vertex = createVertexAtCenter(vertexName);
+			graphService.addVertex(vertex);
+		}
 	}
 }

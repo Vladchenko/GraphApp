@@ -6,11 +6,11 @@ import org.w3c.dom.Node;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 import ru.yanchenko.vlad.graphapp.AppConfig;
+import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
+import ru.yanchenko.vlad.graphapp.models.domain.Graph;
 import ru.yanchenko.vlad.graphapp.models.presentation.VertexTextSizer;
-import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
+import ru.yanchenko.vlad.graphapp.models.vertex.*;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.OutputKeys;
@@ -21,6 +21,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -310,6 +311,59 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
         } else {
             return "(" + locator.getLineNumber() + ", " + locator.getColumnNumber() + ")";
         }
+    }
+
+    /**
+     * Loads graph data from XML file using GraphDomainService.
+     *
+     * @param graphService the graph domain service to load data into
+     */
+    @Override
+    public void loadFromFile(GraphDomainService graphService) throws ParserConfigurationException {
+        List<Vertex> vertices = new ArrayList<>();
+        List<Edge> edges = new ArrayList<>();
+        
+        // Create a temporary VerticesData for the existing XML parsing logic
+        VerticesData tempVerticesData = new VerticesData(vertices, new VertexLink(), new VertexPossibleLink(), new ArrayList<>(), new ArrayList<>());
+        
+        // Use existing XML parsing logic
+        loadFromFile(tempVerticesData);
+        
+        // Convert VertexLinks to Edges
+        for (VertexLink link : tempVerticesData.getVerticesLinks()) {
+            edges.add(new Edge(link.getLink1(), link.getLink2()));
+        }
+        
+        // Update the graph service with loaded data
+        graphService.updateGraph(new Graph(vertices, edges));
+    }
+
+    /**
+     * Saves graph data to XML file using GraphDomainService.
+     *
+     * @param graphService the graph domain service to save data from
+     */
+    @Override
+    public void saveToFile(GraphDomainService graphService) {
+        Graph graph = graphService.getCurrentGraph();
+        
+        // Convert Edges to VertexLinks for the existing XML saving logic
+        List<VertexLink> vertexLinks = new ArrayList<>();
+        for (Edge edge : graph.getEdges()) {
+            vertexLinks.add(new VertexLink(edge.from(), edge.to()));
+        }
+        
+        // Create a temporary VerticesData for the existing XML saving logic
+        VerticesData tempVerticesData = new VerticesData(
+            graph.getVertices(), 
+            new VertexLink(), 
+            new VertexPossibleLink(), 
+            vertexLinks, 
+            new ArrayList<>()
+        );
+        
+        // Use existing XML saving logic
+        saveToFile(tempVerticesData);
     }
 
 }
