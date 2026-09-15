@@ -5,11 +5,12 @@ import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexDeletionService;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexLayoutService;
 import ru.yanchenko.vlad.graphapp.models.PopulationKind;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
+import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -39,7 +40,6 @@ public class DeleteVertexAction extends GraphAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        VerticesData verticesData = context.getVerticesData();
 
         if (!canDeleteVertex()) {
             LOGGER.warning("Cannot delete vertex - no selection or operation in progress");
@@ -48,13 +48,15 @@ public class DeleteVertexAction extends GraphAction {
 
         try {
             int selectedIndex = uiState.getSelectedVertexIndex();
-            String vertexName = getVertexName(verticesData, selectedIndex);
+            String vertexName = getVertexName(
+                    context.getGraphService().getCurrentGraph().getVertices(),
+                    selectedIndex);
 
             // Delete the vertex
-            vertexDeletionService.deleteVertexByIndex(selectedIndex, verticesData, uiState);
+            vertexDeletionService.deleteVertexByIndex(selectedIndex, context.getGraphService(), uiState);
 
             // Relayout if needed
-            maybeRelayout(verticesData);
+            maybeRelayout(context.getGraphService().getCurrentGraph().getVertices());
 
             // Clear selection
             uiState.setSelectedVertexIndex(-1);
@@ -85,11 +87,11 @@ public class DeleteVertexAction extends GraphAction {
     }
 
     /**
-     * Get vertex name for logging.
+     * Get vertex name.
      */
-    private String getVertexName(VerticesData verticesData, int index) {
-        if (index >= 0 && index < verticesData.getVertices().size()) {
-            return verticesData.getVertices().get(index).getVertexName();
+    private String getVertexName(List<Vertex> vertices, int index) {
+        if (index >= 0 && index < vertices.size()) {
+            return vertices.get(index).getVertexName();
         }
         return "Unknown";
     }
@@ -97,11 +99,11 @@ public class DeleteVertexAction extends GraphAction {
     /**
      * Relayout vertices if needed based on population kind.
      */
-    private void maybeRelayout(VerticesData verticesData) {
+    private void maybeRelayout(List<Vertex> vertices) {
         PopulationKind populationKind = context.getPopulationKind();
         if (populationKind == PopulationKind.CIRCULAR_FILE ||
                 populationKind == PopulationKind.HARDCODED_SAMPLE_B) {
-            vertexLayoutService.layoutVertices(verticesData.getVertices());
+            vertexLayoutService.layoutVertices(vertices);
         }
     }
 
