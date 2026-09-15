@@ -7,6 +7,10 @@ group = "org.example"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    maven {
+        isAllowInsecureProtocol = true
+        url = uri("http://localhost:8081/repository/maven-public/")
+    }
     mavenCentral()
     google()
     maven {
