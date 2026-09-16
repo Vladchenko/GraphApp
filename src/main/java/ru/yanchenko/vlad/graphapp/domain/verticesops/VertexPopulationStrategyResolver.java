@@ -49,7 +49,7 @@ public class VertexPopulationStrategyResolver {
             case FIXED_FILE -> new FixedFileStrategy(persistable);
             case CIRCULAR_FILE -> new CircularFileStrategy(persistable, layoutStrategy);
             case HARDCODED_SAMPLE_A -> new HardcodedSampleAStrategy(vertexCreationService);
-            case HARDCODED_SAMPLE_B -> new HardcodedSampleBStrategy(vertexCreationService);
+            case HARDCODED_SAMPLE_B -> new HardcodedSampleBStrategy(vertexCreationService, layoutStrategy);
         };
     }
 }

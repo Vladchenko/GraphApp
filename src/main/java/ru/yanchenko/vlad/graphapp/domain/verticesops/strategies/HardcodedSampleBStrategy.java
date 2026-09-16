@@ -3,6 +3,10 @@ package ru.yanchenko.vlad.graphapp.domain.verticesops.strategies;
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexCreationService;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
+import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
+
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Strategy that populates the graph with 11 hardcoded vertices by name only.
@@ -14,14 +18,16 @@ import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
  */
 public class HardcodedSampleBStrategy implements VertexPopulationStrategy {
     private final VertexCreationService vertexCreationService;
+    private final Consumer<List<Vertex>> layoutStrategy;
 
     /**
      * Creates a HardcodedSampleBStrategy with the specified vertex creation service.
      *
      * @param vertexCreationService the service for creating vertices
      */
-    public HardcodedSampleBStrategy(VertexCreationService vertexCreationService) {
+    public HardcodedSampleBStrategy(VertexCreationService vertexCreationService, Consumer<List<Vertex>> layoutStrategy) {
         this.vertexCreationService = vertexCreationService;
+        this.layoutStrategy = layoutStrategy;
     }
 
     /**
@@ -43,6 +49,8 @@ public class HardcodedSampleBStrategy implements VertexPopulationStrategy {
         vertexCreationService.addVertexByName("345", graphService);
         vertexCreationService.addVertexByName("67890", graphService);
         vertexCreationService.addVertexByName("!@#", graphService);
-        uiState.setAddingVertex(false);
+        if (layoutStrategy != null) {
+            layoutStrategy.accept(graphService.getCurrentGraph().getVertices());
+        }
     }
 }
