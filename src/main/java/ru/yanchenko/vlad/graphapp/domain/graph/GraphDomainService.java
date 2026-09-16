@@ -4,11 +4,9 @@ package ru.yanchenko.vlad.graphapp.domain.graph;
 import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.domain.Graph;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Central service for managing graph domain data (vertices and edges).
@@ -144,33 +142,5 @@ public class GraphDomainService {
         } else {
             throw new IndexOutOfBoundsException("Index out of bounds when removing edge");
         }
-    }
-
-    /**
-     * Converts the current graph's edges to a list of legacy {@link VertexLink} objects.
-     * <p>
-     * Provided for backward compatibility with code that still uses {@code VertexLink}.
-     *
-     * @return a list of VertexLink instances representing the current edges
-     */
-    public List<VertexLink> convertEdgesToLinks() {
-        return currentGraph.getEdges().stream()
-                .map(edge -> new VertexLink(edge.from(), edge.to()))
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Replaces the current graph's edges with edges derived from a list of {@link VertexLink} objects.
-     * <p>
-     * Provided for backward compatibility with code that still uses {@code VertexLink}.
-     *
-     * @param links the list of VertexLink instances to convert and set as current edges
-     */
-    public void updateFromLinks(List<VertexLink> links) {
-        List<Edge> edges = links.stream()
-                .map(link -> new Edge(link.getLink1(), link.getLink2()))
-                .toList();
-        currentGraph.getEdges().clear();
-        currentGraph.getEdges().addAll(edges);
     }
 }

@@ -225,7 +225,7 @@ public class DrawingPanel extends JPanel {
         int y = 40;
         g2.drawString("Vertices: " + graphService.getCurrentGraph().getVertices().size(), 10, y);
         y += 15;
-        g2.drawString("Edges: " + graphService.convertEdgesToLinks().size(), 10, y);
+        g2.drawString("Edges: " + graphService.getCurrentGraph().getEdges().size(), 10, y);
         y += 15;
         g2.drawString("Selected: " + uiState.getSelectedVertexIndex(), 10, y);
         y += 15;

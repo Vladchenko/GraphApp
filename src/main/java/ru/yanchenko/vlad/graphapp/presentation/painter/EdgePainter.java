@@ -86,16 +86,14 @@ public class EdgePainter {
      * Draws all edges between vertices in the current graph.
      * <p>
      * Iterates through all edges (converted from domain {@link Edge} objects to {@link VertexLink} objects)
-     * and calls {@link #drawEdge(Graphics2D, VertexLink, java.util.List)} for each one.
+     * and calls {@link #drawEdge(Graphics2D, Edge, List)} for each one.
      *
      * @param g2 the graphics context to draw on
      */
     public void drawEdges(Graphics2D g2) {
         g2.setColor(UiColors.VERTEX_LINKS_COLOR);
-        List<VertexLink> verticesLinks = graphService.convertEdgesToLinks();
         List<Vertex> vertices = graphService.getCurrentGraph().getVertices();
-
-        for (VertexLink link : verticesLinks) {
+        for (Edge link : graphService.getCurrentGraph().getEdges()) {
             drawEdge(g2, link, vertices);
         }
     }
@@ -108,20 +106,17 @@ public class EdgePainter {
      * draws the connecting line, and renders small circles at both endpoints.
      *
      * @param g2       the graphics context to draw on
-     * @param link     the edge link containing source and target vertex indices
+     * @param edge     the link containing source and target vertex indices
      * @param vertices the list of all vertices in the graph
      */
-    private void drawEdge(Graphics2D g2, VertexLink link, List<Vertex> vertices) {
-        int link1Index = link.getLink1();
-        int link2Index = link.getLink2();
-
+    private void drawEdge(Graphics2D g2, Edge edge, List<Vertex> vertices) {
         // Validate indices
-        if (link1Index >= vertices.size() || link2Index >= vertices.size()) {
+        if (edge.from() >= vertices.size() || edge.to() >= vertices.size()) {
             return;
         }
 
-        Vertex vertex1 = vertices.get(link1Index);
-        Vertex vertex2 = vertices.get(link2Index);
+        Vertex vertex1 = vertices.get(edge.from());
+        Vertex vertex2 = vertices.get(edge.to());
 
         // Calculate connection points on vertex boundaries
         Point2D connectionPoint1 = connectionPointCalculator.calculateConnectionPoint(vertex1, vertex2);
@@ -143,7 +138,7 @@ public class EdgePainter {
      * <p>
      * Used as a terminator marker at each end of an edge line to visually indicate
      * the connection point on a vertex boundary. This shared method is called by both
-     * {@link #drawEdge(Graphics2D, VertexLink, List)} and {@link #drawPossibleEdge(Graphics2D)}.
+     * {@link #drawEdge(Graphics2D, Edge, List)} and {@link #drawPossibleEdge(Graphics2D)}.
      *
      * @param g2 the graphics context to draw on
      * @param x  the x-coordinate of the terminator center
