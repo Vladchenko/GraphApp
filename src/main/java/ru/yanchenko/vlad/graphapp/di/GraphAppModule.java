@@ -43,7 +43,7 @@ import java.util.function.Consumer;
 @Module
 public class GraphAppModule {
 
-    private static final double GRAPH_INITIAL_RADIUS = 200;
+    private static final double GRAPH_INITIAL_RADIUS = 300;
     public static final String ROTATE_CLOCKWISE = "rotateClockwise";
     public static final String COUNTER_ROTATE_CLOCKWISE = "rotateCounterClockwise";
 
