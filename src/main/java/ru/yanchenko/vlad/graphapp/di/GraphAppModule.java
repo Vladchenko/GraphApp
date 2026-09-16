@@ -11,7 +11,7 @@ import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.FileActionContext
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.RefreshService;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.*;
-import ru.yanchenko.vlad.graphapp.domain.verticesops.strategies.*;
+import ru.yanchenko.vlad.graphapp.domain.verticesops.strategies.VertexPopulationStrategy;
 import ru.yanchenko.vlad.graphapp.listeners.KeyboardState;
 import ru.yanchenko.vlad.graphapp.listeners.MouseMotionListenerImpl;
 import ru.yanchenko.vlad.graphapp.listeners.TextInputListener;
@@ -85,30 +85,9 @@ public class GraphAppModule {
 
     @Provides
     @Singleton
-    public VertexPopulationStrategy provideVertexPopulationStrategy(Persistable persistable,
-                                                                    PopulationKind populationKind,
-                                                                    Consumer<List<Vertex>> layoutStrategiesList,
-                                                                    VertexCreationService vertexCreationService) {
-        VertexPopulationStrategy strategy = null;
-        switch (populationKind) {
-            case FIXED_FILE: {
-                strategy = new FixedFileStrategy(persistable);
-                break;
-            }
-            case CIRCULAR_FILE: {
-                strategy = new CircularFileStrategy(persistable, layoutStrategiesList);
-                break;
-            }
-            case HARDCODED_SAMPLE_A: {
-                strategy = new HardcodedSampleAStrategy(vertexCreationService);
-                break;
-            }
-            case HARDCODED_SAMPLE_B: {
-                strategy = new HardcodedSampleBStrategy(vertexCreationService);
-                break;
-            }
-        }
-        return strategy;
+    public VertexPopulationStrategy provideVertexPopulationStrategy(VertexPopulationStrategyResolver resolver,
+                                                                    PopulationKind populationKind) {
+        return resolver.resolve(populationKind);
     }
 
     @Provides
@@ -146,6 +125,22 @@ public class GraphAppModule {
     @Singleton
     public VertexLayoutService provideVertexLayoutService(Consumer<List<Vertex>> layoutStrategy) {
         return new VertexLayoutService(layoutStrategy);
+    }
+
+    /**
+     * Provides a VertexPopulationStrategyResolver instance.
+     *
+     * @param persistable the persistence service
+     * @param layoutStrategy the layout strategy
+     * @param vertexCreationService the vertex creation service
+     * @return the resolver instance
+     */
+    @Provides
+    @Singleton
+    public VertexPopulationStrategyResolver provideVertexPopulationStrategyResolver(Persistable persistable,
+                                                                                      Consumer<List<Vertex>> layoutStrategy,
+                                                                                      VertexCreationService vertexCreationService) {
+        return new VertexPopulationStrategyResolver(persistable, layoutStrategy, vertexCreationService);
     }
 
     @Provides
