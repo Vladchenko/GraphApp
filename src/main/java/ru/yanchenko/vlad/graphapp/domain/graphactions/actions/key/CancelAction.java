@@ -1,10 +1,12 @@
 package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.EditActionContext;
+import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.logging.Logger;
 
 /**
@@ -20,7 +22,8 @@ public class CancelAction extends GraphAction {
     public CancelAction(EditActionContext editContext, GraphUiState uiState) {
         super("Cancel");
         this.editContext = editContext;
-        this.uiState = uiState;
+        this.uiState = uiState; 
+        putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }
 
     @Override
@@ -61,17 +64,17 @@ public class CancelAction extends GraphAction {
      * Clear domain data state.
      */
     private void clearDomainDataState() {
-        VerticesData verticesData = editContext.getVerticesData();
+        GraphUiData graphUiData = editContext.getGraphUiData();
 
         // Clear any ongoing link creation
-        verticesData.getVertexLink().setLink1(-1);
-        verticesData.getVertexLink().setLink2(-1);
+        graphUiData.getCurrentLink().setLink1(-1);
+        graphUiData.getCurrentLink().setLink2(-1);
 
         // Clear possible link preview
-        verticesData.getVertexPossibleLink().setX1(-10);
-        verticesData.getVertexPossibleLink().setY1(-10);
-        verticesData.getVertexPossibleLink().setX2(-10);
-        verticesData.getVertexPossibleLink().setY2(-10);
+        graphUiData.getPossibleLink().setX1(-10);
+        graphUiData.getPossibleLink().setY1(-10);
+        graphUiData.getPossibleLink().setX2(-10);
+        graphUiData.getPossibleLink().setY2(-10);
     }
 
     /**

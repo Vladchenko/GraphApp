@@ -8,7 +8,6 @@ import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexPopulationService;
 import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingPanel;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingTimer;
 
@@ -29,7 +28,6 @@ public interface GraphAppComponent {
     GraphUiState getGraphUiState();
     GraphDomainService getGraphDomainService();
     GraphUiStateService getGraphUiStateService();
-    VerticesData getVerticesData();
     ActionManager getActionManager();
     KeyListener getTextInputListener();
     MouseActionManager getMouseActionManager();

@@ -1,10 +1,10 @@
 package ru.yanchenko.vlad.graphapp.listeners;
 
+import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.geometry.Geometry;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
+import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingTimer;
 
 import java.awt.event.MouseEvent;
@@ -20,17 +20,17 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
     private static final Logger LOGGER = Logger.getLogger(MouseMotionListenerImpl.class.getName());
 
     private final DrawingTimer drawingTimer;
-    private final VerticesData verticesData; // Domain data
-    private final GraphUiState uiState; // UI state
+    private final GraphDomainService graphService; // Domain data
+    private final GraphUiStateService uiStateService; // UI state
     private final KeyboardState keyboardState;
 
     public MouseMotionListenerImpl(DrawingTimer drawingTimer,
-                                   VerticesData verticesData,
-                                   GraphUiState uiState,
+                                   GraphDomainService graphService,
+                                   GraphUiStateService uiStateService,
                                    KeyboardState keyboardState) {
         this.drawingTimer = drawingTimer;
-        this.verticesData = verticesData;
-        this.uiState = uiState;
+        this.graphService = graphService;
+        this.uiStateService = uiStateService;
         this.keyboardState = keyboardState;
     }
 
@@ -38,7 +38,7 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
     public void mouseDragged(MouseEvent e) {
         try {
             // Update mouse position in UI state
-            uiState.setCurrentMousePosition(e.getPoint());
+            uiStateService.getUiState().setCurrentMousePosition(e.getPoint());
 
             // Handle vertex dragging or link creation
             if (keyboardState.isKeyCtrl()) {
@@ -58,7 +58,7 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
     public void mouseMoved(MouseEvent e) {
         try {
             // Update mouse position in UI state
-            uiState.setCurrentMousePosition(e.getPoint());
+            uiStateService.getUiState().setCurrentMousePosition(e.getPoint());
 
         } catch (Exception ex) {
             LOGGER.log(java.util.logging.Level.SEVERE, "Error in mouse move", ex);
@@ -69,8 +69,8 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      * Handle vertex dragging when Ctrl key is pressed.
      */
     private void handleVertexDragging(MouseEvent e) {
-        int chosenVertex = verticesData.getVertexLink().getLink1();
-        List<Vertex> verticesList = verticesData.getVertices();
+        int chosenVertex = uiStateService.getUiData().getCurrentLink().getLink1();
+        List<Vertex> verticesList = graphService.getCurrentGraph().getVertices();
 
         if (chosenVertex != -1 && chosenVertex < verticesList.size()) {
             Vertex vertex = verticesList.get(chosenVertex);
@@ -85,9 +85,9 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      * Handle link creation preview when dragging from a vertex.
      */
     private void handleLinkCreation(MouseEvent e) {
-        int chosenVertex = verticesData.getVertexLink().getLink1();
-        VertexLink vertexLink = verticesData.getVertexLink();
-        List<Vertex> verticesList = verticesData.getVertices();
+        int chosenVertex = uiStateService.getUiData().getCurrentLink().getLink1();
+        VertexLink vertexLink = uiStateService.getUiData().getCurrentLink();
+        List<Vertex> verticesList = graphService.getCurrentGraph().getVertices();
 
         if (chosenVertex == -1 || chosenVertex >= verticesList.size()) {
             return;
@@ -121,12 +121,12 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      */
     private void setFirstTerminator(Vertex sourceVertex, double angle) {
         int x1 = (int) (sourceVertex.getX() +
-                Math.cos(angle) * (sourceVertex.getRadius() + uiState.getVertexLinkMargin()));
+                Math.cos(angle) * (sourceVertex.getRadius() + uiStateService.getUiState().getVertexLinkMargin()));
         int y1 = (int) (sourceVertex.getY() -
-                Math.sin(angle) * (sourceVertex.getRadius() + uiState.getVertexLinkMargin()));
+                Math.sin(angle) * (sourceVertex.getRadius() + uiStateService.getUiState().getVertexLinkMargin()));
 
-        verticesData.getVertexPossibleLink().setX1(x1);
-        verticesData.getVertexPossibleLink().setY1(y1);
+        uiStateService.getUiData().getPossibleLink().setX1(x1);
+        uiStateService.getUiData().getPossibleLink().setY1(y1);
     }
 
     /**
@@ -134,37 +134,39 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      */
     private boolean isMouseWithinVertexArea(double vertexX, double vertexY, int mouseX, int mouseY, Vertex vertex) {
         return Geometry.computeDistance(vertexX, vertexY, mouseX, mouseY) <=
-                vertex.getRadius() + uiState.getVertexLinkMargin();
+                vertex.getRadius() + uiStateService.getUiState().getVertexLinkMargin();
     }
 
     /**
      * Set second terminator to same as first.
      */
     private void setSecondTerminatorToFirst() {
-        verticesData.getVertexPossibleLink().setX2(verticesData.getVertexPossibleLink().getX1());
-        verticesData.getVertexPossibleLink().setY2(verticesData.getVertexPossibleLink().getY1());
+        uiStateService.getUiData().getPossibleLink().setX2(
+                uiStateService.getUiData().getPossibleLink().getX1());
+        uiStateService.getUiData().getPossibleLink().setY2(
+                uiStateService.getUiData().getPossibleLink().getY1());
     }
 
     /**
      * Set second terminator to mouse position.
      */
     private void setSecondTerminatorToMouse(MouseEvent e) {
-        verticesData.getVertexPossibleLink().setX2(e.getX());
-        verticesData.getVertexPossibleLink().setY2(e.getY());
+        uiStateService.getUiData().getPossibleLink().setX2(e.getX());
+        uiStateService.getUiData().getPossibleLink().setY2(e.getY());
     }
 
     /**
      * Check for intersections with other vertices and adjust terminators.
      */
     private void checkVertexIntersections(MouseEvent e, double subjectX1, double subjectY1, Vertex sourceVertex) {
-        List<Vertex> verticesList = verticesData.getVertices();
-        int sourceIndex = verticesData.getVertexLink().getLink1();
+        List<Vertex> verticesList = graphService.getCurrentGraph().getVertices();
+        int sourceIndex = uiStateService.getUiData().getCurrentLink().getLink1();
 
         for (int i = 0; i < verticesList.size(); i++) {
             Vertex vertex = verticesList.get(i);
 
             if (Geometry.computeDistance(vertex.getX(), vertex.getY(), e.getX(), e.getY()) <=
-                    vertex.getRadius() + uiState.getVertexLinkMargin()) {
+                    vertex.getRadius() + uiStateService.getUiState().getVertexLinkMargin()) {
 
                 if (i != sourceIndex) {
                     // Calculate angle to target vertex
@@ -185,12 +187,12 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      */
     private void setSecondTerminatorToVertex(Vertex targetVertex, double angle) {
         int x2 = (int) (targetVertex.getX() +
-                Math.cos(angle) * (targetVertex.getRadius() + uiState.getVertexLinkMargin()));
+                Math.cos(angle) * (targetVertex.getRadius() + uiStateService.getUiState().getVertexLinkMargin()));
         int y2 = (int) (targetVertex.getY() -
-                Math.sin(angle) * (targetVertex.getRadius() + uiState.getVertexLinkMargin()));
+                Math.sin(angle) * (targetVertex.getRadius() + uiStateService.getUiState().getVertexLinkMargin()));
 
-        verticesData.getVertexPossibleLink().setX2(x2);
-        verticesData.getVertexPossibleLink().setY2(y2);
+        uiStateService.getUiData().getPossibleLink().setX2(x2);
+        uiStateService.getUiData().getPossibleLink().setY2(y2);
     }
 
     /**
@@ -198,8 +200,8 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      */
     private void recalculateFirstTerminator(double subjectX1, double subjectY1, Vertex sourceVertex) {
         double angle = Geometry.computeAngle(subjectX1, subjectY1,
-                verticesData.getVertexPossibleLink().getX2(),
-                verticesData.getVertexPossibleLink().getY2());
+                uiStateService.getUiData().getPossibleLink().getX2(),
+                uiStateService.getUiData().getPossibleLink().getY2());
 
         setFirstTerminator(sourceVertex, angle);
     }

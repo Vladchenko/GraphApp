@@ -20,8 +20,6 @@ import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesDataFacade;
 import ru.yanchenko.vlad.graphapp.persistence.JsonPersistence;
 import ru.yanchenko.vlad.graphapp.persistence.Persistable;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingPanel;
@@ -71,18 +69,6 @@ public class GraphAppModule {
     public Persistable providePersistable() {
         return new JsonPersistence();   //XMLPersistence();
     }
-
-//    @Provides
-//    @Singleton
-//    public VerticesData provideVerticesData() {
-//        return new VerticesData(
-//                new ArrayList<>(),
-//                new VertexLink(),
-//                new VertexPossibleLink(),
-//                new ArrayList<>(),
-//                new ArrayList<>()
-//        );
-//    }
 
     @Provides
     @Singleton
@@ -182,10 +168,10 @@ public class GraphAppModule {
     @Provides
     @Singleton
     public MouseMotionListener provideMouseMotionListener(DrawingTimer drawingTimer,
-                                                          VerticesData verticesData,
-                                                          GraphUiState uiState,
+                                                          GraphDomainService graphService,
+                                                          GraphUiStateService uiStateService,
                                                           KeyboardState keyboardState) {
-        return new MouseMotionListenerImpl(drawingTimer, verticesData, uiState, keyboardState);
+        return new MouseMotionListenerImpl(drawingTimer, graphService, uiStateService, keyboardState);
     }
 
     @Provides
@@ -196,30 +182,28 @@ public class GraphAppModule {
 
     @Provides
     @Singleton
-    public FileActionContext provideFileActionContext(Persistable persistable,
-                                                      VerticesData verticesData,
+    public FileActionContext provideFileActionContext(GraphUiState uiState,
+                                                      Persistable persistable,
                                                       RefreshService refreshService,
-                                                      GraphUiState uiState,
                                                       GraphDomainService graphService,
                                                       GraphUiStateService uiStateService) {
-        return new FileActionContext(persistable, verticesData, refreshService, uiState, graphService, uiStateService);
+        return new FileActionContext(persistable, refreshService, uiState, graphService, uiStateService);
     }
 
     @Provides
     @Singleton
     public GraphActionContext provideGraphActionContext(GraphDomainService graphService,
                                                         GraphUiStateService uiStateService,
-                                                        VerticesData verticesData,
                                                         RefreshService refreshService,
                                                         PopulationKind populationKind) {
-        return new GraphActionContext(graphService, uiStateService, verticesData, refreshService, populationKind);
+        return new GraphActionContext(graphService, uiStateService, refreshService, populationKind);
     }
 
     @Provides
     @Singleton
-    public EditActionContext provideEditActionContext(VerticesData verticesData,
+    public EditActionContext provideEditActionContext(GraphUiStateService uiStateService,
                                                       RefreshService refreshService) {
-        return new EditActionContext(verticesData, refreshService);
+        return new EditActionContext(uiStateService.getUiData(), refreshService);
     }
 
     // Action providers
@@ -276,19 +260,23 @@ public class GraphAppModule {
     @Provides
     @Singleton
     @Named(ROTATE_CLOCKWISE)
-    public RotateAction provideRotateClockwiseAction(GraphActionContext graphContext,
-                                                     GraphUiState uiState,
+    public RotateAction provideRotateClockwiseAction(GraphUiState uiState,
+                                                     GraphDomainService graphService,
+                                                     GraphUiStateService uiStateService,
                                                      VertexRotationService vertexRotationService) {
-        return new RotateAction(RotateAction.Direction.CLOCKWISE, graphContext, uiState, vertexRotationService);
+        return new RotateAction(RotateAction.Direction.CLOCKWISE, uiStateService.getUiData(), uiState, graphService,
+                vertexRotationService);
     }
 
     @Provides
     @Singleton
     @Named("rotateCounterClockwise")
-    public RotateAction provideRotateCounterClockwiseAction(GraphActionContext graphContext,
-                                                            GraphUiState uiState,
+    public RotateAction provideRotateCounterClockwiseAction(GraphUiState uiState,
+                                                            GraphDomainService graphService,
+                                                            GraphUiStateService uiStateService,
                                                             VertexRotationService vertexRotationService) {
-        return new RotateAction(RotateAction.Direction.COUNTER_CLOCKWISE, graphContext, uiState, vertexRotationService);
+        return new RotateAction(RotateAction.Direction.COUNTER_CLOCKWISE, uiStateService.getUiData(), uiState,
+                graphService, vertexRotationService);
     }
 
     @Provides
@@ -320,9 +308,8 @@ public class GraphAppModule {
     @Singleton
     public MouseActionManager provideMouseActionManager(GraphActionContext graphContext,
                                                         GraphUiState uiState,
-                                                        VertexDeletionService vertexDeletionService,
                                                         VertexRotationService vertexRotationService) {
-        return new MouseActionManager(graphContext, uiState, vertexDeletionService, vertexRotationService);
+        return new MouseActionManager(graphContext, uiState, vertexRotationService);
     }
 
     @Provides
@@ -342,19 +329,5 @@ public class GraphAppModule {
     @Singleton
     public GraphUiStateService provideGraphUiStateService(GraphUiState uiState) {
         return new GraphUiStateService(uiState);
-    }
-
-    @Provides
-    @Singleton
-    public VerticesDataFacade provideVerticesDataFacade(GraphDomainService graphService,
-                                                        GraphUiStateService uiStateService) {
-        return new VerticesDataFacade(graphService, uiStateService);
-    }
-
-    // Update the existing VerticesData provider to use the facade
-    @Provides
-    @Singleton
-    public VerticesData provideVerticesData(VerticesDataFacade facade) {
-        return facade.asVerticesData();
     }
 }

@@ -8,9 +8,9 @@ import org.xml.sax.helpers.DefaultHandler;
 import ru.yanchenko.vlad.graphapp.AppConfig;
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.models.domain.Edge;
-import ru.yanchenko.vlad.graphapp.models.domain.Graph;
 import ru.yanchenko.vlad.graphapp.models.presentation.VertexTextSizer;
-import ru.yanchenko.vlad.graphapp.models.vertex.*;
+import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
+import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.OutputKeys;
@@ -21,7 +21,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -38,11 +37,11 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
 
     private Locator locator;
     private int currentVertex1 = -1;
-    private VerticesData verticesData;
+    private GraphDomainService graphService;
 
     @Override
-    public void loadFromFile(VerticesData verticesData) throws ParserConfigurationException {
-        this.verticesData = verticesData;
+    public void loadFromFile(GraphDomainService graphService) throws ParserConfigurationException {
+        this.graphService = graphService;
         XMLReader xmlReader = null;
         SAXParser saxParser;
         SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -66,8 +65,8 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
     }
 
     @Override
-    public void saveToFile(VerticesData verticesData) {
-        this.verticesData = verticesData;
+    public void saveToFile(GraphDomainService graphService) {
+        this.graphService = graphService;
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder;
         try {
@@ -79,31 +78,31 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
             Element rootElement = doc.createElement("Graph");
             doc.appendChild(rootElement);
 
-            Node[] vertexElement = new Node[verticesData.getVertices().size()];
-            Node[] vertexLinkElement = new Node[verticesData.getVerticesLinks().size()];
+            Node[] vertexElement = new Node[graphService.getCurrentGraph().getVertices().size()];
+            Node[] vertexLinkElement = new Node[graphService.getCurrentGraph().getEdges().size()];
 
-            for (int i = 0; i < verticesData.getVertices().size(); i++) {
+            for (int i = 0; i < graphService.getCurrentGraph().getVertices().size(); i++) {
                 // Adding a vertex element
-                if (!verticesData.getVertices().get(i).getVertexName().isEmpty()) {
+                if (!graphService.getCurrentGraph().getVertices().get(i).getVertexName().isEmpty()) {
                     vertexElement[i] = doc.createElement(VERTEX_ELEMENT_NAME);
                     ((Element) vertexElement[i]).setAttribute(VERTEX_NAME_ATTRIBUTE_NAME,
-                            verticesData.getVertices().get(i).getVertexName());
+                            graphService.getCurrentGraph().getVertices().get(i).getVertexName());
                     ((Element) vertexElement[i]).setAttribute("x",
-                            Long.toString(Math.round(verticesData.getVertices().get(i).getX())));
+                            Long.toString(Math.round(graphService.getCurrentGraph().getVertices().get(i).getX())));
                     ((Element) vertexElement[i]).setAttribute("y",
-                            Long.toString(Math.round(verticesData.getVertices().get(i).getY())));
+                            Long.toString(Math.round(graphService.getCurrentGraph().getVertices().get(i).getY())));
                     rootElement.appendChild(vertexElement[i]);
                 }
 
-                for (int j = 0; j < verticesData.getVerticesLinks().size(); j++) {
-                    VertexLink vertexLink = verticesData.getVerticesLinks().get(j);
-                    if (verticesData.getVertices().get(vertexLink.getLink1()).getVertexName()
+                for (int j = 0; j < graphService.getCurrentGraph().getEdges().size(); j++) {
+                    Edge edge = graphService.getCurrentGraph().getEdges().get(j);
+                    if (graphService.getCurrentGraph().getVertices().get(edge.from()).getVertexName()
                             .equals(((Element) vertexElement[i]).getAttribute(VERTEX_NAME_ATTRIBUTE_NAME))) {
                         addNode = true;
                         // Check if such a vertexLink exists
                         for (int k = 0; k < vertexElement[i].getChildNodes().getLength(); k++) {
                             if (Objects.equals(
-                                    verticesData.getVertices().get(vertexLink.getLink2()).getVertexName(),
+                                    graphService.getCurrentGraph().getVertices().get(edge.to()).getVertexName(),
                                     vertexElement[i].getChildNodes().item(k).getAttributes()
                                             .getNamedItem(LINK_ATTRIBUTE_NAME).getNodeValue())) {
                                 addNode = false;
@@ -114,19 +113,19 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
                         if (addNode) {
                             vertexLinkElement[j] = doc.createElement(VERTEX_LINK_ELEMENT_NAME);
                             ((Element) vertexLinkElement[j]).setAttribute(LINK_ATTRIBUTE_NAME,
-                                    verticesData.getVertices().get(
-                                            vertexLink.getLink2()).getVertexName());
+                                    graphService.getCurrentGraph().getVertices().get(
+                                            edge.to()).getVertexName());
                             vertexElement[i].appendChild(vertexLinkElement[j]);
                         }
                     }
 
-                    if (verticesData.getVertices().get(vertexLink.getLink2()).getVertexName()
+                    if (graphService.getCurrentGraph().getVertices().get(edge.to()).getVertexName()
                             .equals(((Element) vertexElement[i]).getAttribute(VERTEX_NAME_ATTRIBUTE_NAME))) {
                         addNode = true;
                         // Check if such a vertexLink exists
                         for (int k = 0; k < vertexElement[i].getChildNodes().getLength(); k++) {
                             if (Objects.equals(
-                                    verticesData.getVertices().get(vertexLink.getLink1()).getVertexName(),
+                                    graphService.getCurrentGraph().getVertices().get(edge.from()).getVertexName(),
                                     vertexElement[i].getChildNodes().item(k).getAttributes()
                                             .getNamedItem(LINK_ATTRIBUTE_NAME).getNodeValue())) {
                                 addNode = false;
@@ -137,8 +136,8 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
                         if (addNode) {
                             vertexLinkElement[j] = doc.createElement(VERTEX_LINK_ELEMENT_NAME);
                             ((Element) vertexLinkElement[j]).setAttribute(LINK_ATTRIBUTE_NAME,
-                                    verticesData.getVertices().get(
-                                            vertexLink.getLink1()).getVertexName());
+                                    graphService.getCurrentGraph().getVertices().get(
+                                            edge.from()).getVertexName());
                             vertexElement[i].appendChild(vertexLinkElement[j]);
                         }
                     }
@@ -172,7 +171,7 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
             if (atts.getLocalName(0).equals(VERTEX_NAME_ATTRIBUTE_NAME)) {
                 int vertexPosition = isExistingVertex(
                         atts.getValue(0),
-                        verticesData.getVertices());
+                        graphService.getCurrentGraph().getVertices());
                 if (vertexPosition == -1) {
                     if (!atts.getLocalName(1).isBlank()
                             && atts.getLocalName(1).equals("x")
@@ -182,7 +181,7 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
                                 && isInteger(atts.getValue(2))) {
                             double radius = VertexTextSizer.computeRadius(
                                     VertexFont.VERTICES_FONT, atts.getValue(0));
-                            verticesData.getVertices().add(
+                            graphService.getCurrentGraph().getVertices().add(
                                     new Vertex(
                                             Integer.parseInt(atts.getValue(1)),
                                             Integer.parseInt(atts.getValue(2)),
@@ -196,7 +195,7 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
                         Logger.getLogger(XMLPersistence.class.getName())
                                 .log(Level.SEVERE, "\"x\" attribute should go after \"name\"");
                     }
-                    currentVertex1 = verticesData.getVertices().size() - 1;
+                    currentVertex1 = graphService.getCurrentGraph().getVertices().size() - 1;
                 } else {
                     if (!atts.getLocalName(1).isBlank()
                             && atts.getLocalName(1).equals("x")
@@ -204,9 +203,9 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
                         if (!atts.getLocalName(2).isBlank()
                                 && atts.getLocalName(2).equals("y")
                                 && isInteger(atts.getValue(2))) {
-                            verticesData.getVertices().get(vertexPosition).setX(
+                            graphService.getCurrentGraph().getVertices().get(vertexPosition).setX(
                                     Integer.parseInt(atts.getValue(1)));
-                            verticesData.getVertices().get(vertexPosition).setY(
+                            graphService.getCurrentGraph().getVertices().get(vertexPosition).setY(
                                     Integer.parseInt(atts.getValue(2)));
                         } else {
                             Logger.getLogger(XMLPersistence.class.getName())
@@ -229,26 +228,26 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
             if (atts.getLocalName(0).equals(LINK_ATTRIBUTE_NAME)) {
                 int vertexPosition = isExistingVertex(
                         atts.getValue(0),
-                        verticesData.getVertices());
+                        graphService.getCurrentGraph().getVertices());
                 int currentVertex2;
                 if (vertexPosition == -1) {
                     double radius = VertexTextSizer.computeRadius(
                             VertexFont.VERTICES_FONT, atts.getValue(0));
-                    verticesData.getVertices().add(
+                    graphService.getCurrentGraph().getVertices().add(
                             new Vertex(0, 0, radius, atts.getValue(0)));
-                    currentVertex2 = verticesData.getVertices().size() - 1;
+                    currentVertex2 = graphService.getCurrentGraph().getVertices().size() - 1;
                 } else {
                     currentVertex2 = vertexPosition;
                 }
                 // Avoid self-links and duplicates (A-B or B-A)
                 boolean addition = currentVertex1 != currentVertex2
-                                && verticesData.getVerticesLinks().stream().noneMatch(l ->
-                                (l.getLink1() == currentVertex1 && l.getLink2() == currentVertex2)
-                                        || (l.getLink1() == currentVertex2 && l.getLink2() == currentVertex1));
+                                && graphService.getCurrentGraph().getEdges().stream().noneMatch(edge ->
+                                (edge.from() == currentVertex1 && edge.to() == currentVertex2)
+                                        || (edge.from() == currentVertex2 && edge.to() == currentVertex1));
                 // If such a VertexLink doesn't exist, add it
                 if (addition) {
-                    verticesData.getVerticesLinks().add(
-                            new VertexLink(currentVertex1, currentVertex2));
+                    graphService.getCurrentGraph().getEdges().add(
+                            new Edge(currentVertex1, currentVertex2));
                 }
             } else {
                 Logger.getLogger(XMLPersistence.class.getName())
@@ -312,58 +311,4 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
             return "(" + locator.getLineNumber() + ", " + locator.getColumnNumber() + ")";
         }
     }
-
-    /**
-     * Loads graph data from XML file using GraphDomainService.
-     *
-     * @param graphService the graph domain service to load data into
-     */
-    @Override
-    public void loadFromFile(GraphDomainService graphService) throws ParserConfigurationException {
-        List<Vertex> vertices = new ArrayList<>();
-        List<Edge> edges = new ArrayList<>();
-        
-        // Create a temporary VerticesData for the existing XML parsing logic
-        VerticesData tempVerticesData = new VerticesData(vertices, new VertexLink(), new VertexPossibleLink(), new ArrayList<>(), new ArrayList<>());
-        
-        // Use existing XML parsing logic
-        loadFromFile(tempVerticesData);
-        
-        // Convert VertexLinks to Edges
-        for (VertexLink link : tempVerticesData.getVerticesLinks()) {
-            edges.add(new Edge(link.getLink1(), link.getLink2()));
-        }
-        
-        // Update the graph service with loaded data
-        graphService.updateGraph(new Graph(vertices, edges));
-    }
-
-    /**
-     * Saves graph data to XML file using GraphDomainService.
-     *
-     * @param graphService the graph domain service to save data from
-     */
-    @Override
-    public void saveToFile(GraphDomainService graphService) {
-        Graph graph = graphService.getCurrentGraph();
-        
-        // Convert Edges to VertexLinks for the existing XML saving logic
-        List<VertexLink> vertexLinks = new ArrayList<>();
-        for (Edge edge : graph.getEdges()) {
-            vertexLinks.add(new VertexLink(edge.from(), edge.to()));
-        }
-        
-        // Create a temporary VerticesData for the existing XML saving logic
-        VerticesData tempVerticesData = new VerticesData(
-            graph.getVertices(), 
-            new VertexLink(), 
-            new VertexPossibleLink(), 
-            vertexLinks, 
-            new ArrayList<>()
-        );
-        
-        // Use existing XML saving logic
-        saveToFile(tempVerticesData);
-    }
-
 }

@@ -1,7 +1,6 @@
 package ru.yanchenko.vlad.graphapp.domain.verticesops;
 
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -18,19 +17,6 @@ public class VertexValidationService {
      */
     public boolean isVertexExist(String vertexName, GraphDomainService graphService) {
         return isVertexCanBeAdded(vertexName, graphService.getCurrentGraph().getVertices());
-    }
-
-    /**
-     * Checks if a vertex with the given name can be added (i.e., doesn't already exist).
-     * 
-     * @param vertexName the name to check
-     * @param verticesData the vertices data to check against
-     * @return true if vertex can be added (doesn't exist), false if it already exists
-     * @deprecated Use isVertexExist(String, GraphDomainService) instead
-     */
-    @Deprecated
-    public boolean isVertexExist(String vertexName, VerticesData verticesData) {
-        return isVertexCanBeAdded(vertexName, verticesData.getVertices());
     }
 
     /**

@@ -2,10 +2,11 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse;
 
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key.GraphAction;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
-import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexDeletionService;
 import ru.yanchenko.vlad.graphapp.geometry.Geometry;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
+import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -17,26 +18,23 @@ public class MouseReleaseAction extends GraphAction {
     private final GraphUiState uiState;
     private final MouseEvent mouseEvent;
     private final boolean isRightMouseButton;
-    private final VertexDeletionService vertexDeletionService;
 
     public MouseReleaseAction(GraphActionContext context,
                               GraphUiState uiState,
                               MouseEvent mouseEvent,
-                              boolean isRightMouseButton,
-                              VertexDeletionService vertexDeletionService) {
+                              boolean isRightMouseButton) {
         super("Mouse Release");
         this.context = context;
         this.uiState = uiState;
         this.mouseEvent = mouseEvent;
         this.isRightMouseButton = isRightMouseButton;
-        this.vertexDeletionService = vertexDeletionService;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
         List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
         int noVertexChosen = 0;
-        ru.yanchenko.vlad.graphapp.models.vertex.VertexLink currentLink = context.getUiStateService().getUiData().getCurrentLink();
+        VertexLink currentLink = context.getUiStateService().getUiData().getCurrentLink();
 
         for (int i = 0; i < vertices.size(); i++) {
             Vertex vertex = vertices.get(i);
@@ -56,10 +54,10 @@ public class MouseReleaseAction extends GraphAction {
 
                     if (isRightMouseButton) {
                         // Remove link using the graph service
-                        context.getGraphService().removeEdge(new ru.yanchenko.vlad.graphapp.models.domain.Edge(currentLink.getLink1(), currentLink.getLink2()));
+                        context.getGraphService().removeEdge(new Edge(currentLink.getLink1(), currentLink.getLink2()));
                     } else {
                         // Add link using the graph service
-                        context.getGraphService().addEdge(new ru.yanchenko.vlad.graphapp.models.domain.Edge(currentLink.getLink1(), currentLink.getLink2()));
+                        context.getGraphService().addEdge(new Edge(currentLink.getLink1(), currentLink.getLink2()));
                     }
                 } else {
                     // Clear link selection

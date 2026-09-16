@@ -5,7 +5,14 @@ import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 
-// Pure domain model - just data, no operations
+/**
+ * Mutable domain model representing a directed graph.
+ * <p>
+ * Contains only data — vertices and edges — with no business logic.
+ * Mutations go through {@link ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService}.
+ * <p>
+ * Edges reference vertices by index, not by object reference.
+ */
 public class Graph {
     private final List<Vertex> vertices;
     private final List<Edge> edges;
@@ -17,21 +24,11 @@ public class Graph {
 
     // Only getters - no business logic
     public List<Vertex> getVertices() {
-        return new ArrayList<>(vertices);
+        return vertices;
     }
 
     public List<Edge> getEdges() {
-        return new ArrayList<>(edges);
+        return edges;
     }
-
-    public int getVertexCount() {
-        return vertices.size();
-    }
-
-    public int getEdgeCount() {
-        return edges.size();
-    }
-
-    // Immutable - no setters
 }
 

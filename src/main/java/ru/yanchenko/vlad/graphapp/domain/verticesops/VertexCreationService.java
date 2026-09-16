@@ -5,7 +5,6 @@ import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.presentation.VertexTextSizer;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
-import ru.yanchenko.vlad.graphapp.models.vertex.VerticesData;
 
 /**
  * Service responsible for creating and adding vertices to the graph.
@@ -36,39 +35,6 @@ public class VertexCreationService {
 	}
 
 	/**
-	 * Adds a vertex by name using VerticesData.
-	 *
-	 * @param vertexName the name of the vertex to add
-	 * @param verticesData the vertices data to add the vertex to
-	 * @deprecated Use addVertexByName(String, GraphDomainService) instead
-	 */
-	@Deprecated
-	public void addVertexByName(String vertexName, VerticesData verticesData) {
-		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, verticesData);
-		if (canAddVertex) {
-			double radius = VertexTextSizer.computeRadius(VertexFont.VERTICES_FONT, vertexName);
-			Vertex vertex = new Vertex(0, 0, radius, vertexName);
-			verticesData.getVertices().add(vertex);
-		}
-	}
-
-	/**
-	 * Adds a vertex at the center of the screen using VerticesData.
-	 *
-	 * @param vertexName the name of the vertex to add
-	 * @param verticesData the vertices data to add the vertex to
-	 * @deprecated Use addVertexAtCenter(String, GraphDomainService) instead
-	 */
-	@Deprecated
-	public void addVertexAtCenter(String vertexName, VerticesData verticesData) {
-		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, verticesData);
-		if (canAddVertex) {
-			Vertex vertex = createVertexAtCenter(vertexName);
-			verticesData.getVertices().add(vertex);
-		}
-	}
-
-	/**
 	 * Adds a vertex at specified coordinates using GraphDomainService.
 	 *
 	 * @param vertexName the name of the vertex to add
@@ -81,24 +47,6 @@ public class VertexCreationService {
 		if (canAddVertex) {
 			Vertex vertex = createVertexAtPosition(vertexName, x, y);
 			graphService.addVertex(vertex);
-		}
-	}
-
-	/**
-	 * Adds a vertex at specified coordinates using VerticesData.
-	 *
-	 * @param vertexName the name of the vertex to add
-	 * @param x the x coordinate
-	 * @param y the y coordinate
-	 * @param verticesData the vertices data to add the vertex to
-	 * @deprecated Use addVertexAtPosition(String, int, int, GraphDomainService) instead
-	 */
-	@Deprecated
-	public void addVertexAtPosition(String vertexName, int x, int y, VerticesData verticesData) {
-		boolean canAddVertex = vertexValidationService.isVertexExist(vertexName, verticesData);
-		if (canAddVertex) {
-			Vertex vertex = createVertexAtPosition(vertexName, x, y);
-			verticesData.getVertices().add(vertex);
 		}
 	}
 
