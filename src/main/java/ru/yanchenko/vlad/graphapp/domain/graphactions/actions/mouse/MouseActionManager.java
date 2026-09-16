@@ -1,7 +1,6 @@
 package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse;
 
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
-import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexDeletionService;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexRotationService;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 
@@ -16,25 +15,39 @@ public class MouseActionManager implements MouseListener, MouseMotionListener, M
     private final GraphActionContext context;
     private final GraphUiState uiState;
     private boolean isRightMouseButton = false;
-    private final VertexDeletionService vertexDeletionService;
     private final VertexRotationService vertexRotationService;
 
+    /**
+     * Creates a MouseActionManager with the specified context and services.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     * @param vertexRotationService the vertex rotation service
+     */
     public MouseActionManager(GraphActionContext context,
                               GraphUiState uiState,
-                              VertexDeletionService vertexDeletionService,
                               VertexRotationService vertexRotationService) {
         this.context = context;
         this.uiState = uiState;
-        this.vertexDeletionService = vertexDeletionService;
         this.vertexRotationService = vertexRotationService;
     }
 
     // MouseListener implementation
+    /**
+     * Handles mouse click events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mouseClicked(MouseEvent e) {
         // No action needed for click
     }
 
+    /**
+     * Handles mouse pressed events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mousePressed(MouseEvent e) {
         // Handle right mouse button state
@@ -45,6 +58,11 @@ public class MouseActionManager implements MouseListener, MouseMotionListener, M
         clickAction.actionPerformed(null);
     }
 
+    /**
+     * Handles mouse released events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
         // Create and execute release action
@@ -52,22 +70,36 @@ public class MouseActionManager implements MouseListener, MouseMotionListener, M
                 context,
                 uiState,
                 e,
-                isRightMouseButton,
-                vertexDeletionService);
+                isRightMouseButton);
         releaseAction.actionPerformed(null);
     }
 
+    /**
+     * Handles mouse entered events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mouseEntered(MouseEvent e) {
         // No action needed
     }
 
+    /**
+     * Handles mouse exited events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mouseExited(MouseEvent e) {
         // No action needed
     }
 
     // MouseMotionListener implementation
+    /**
+     * Handles mouse dragged events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mouseDragged(MouseEvent e) {
         // Create and execute drag action
@@ -75,6 +107,11 @@ public class MouseActionManager implements MouseListener, MouseMotionListener, M
         dragAction.actionPerformed(null);
     }
 
+    /**
+     * Handles mouse moved events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mouseMoved(MouseEvent e) {
         // Update mouse position in UI state
@@ -82,6 +119,11 @@ public class MouseActionManager implements MouseListener, MouseMotionListener, M
     }
 
     // MouseWheelListener implementation
+    /**
+     * Handles mouse wheel moved events.
+     *
+     * @param e the mouse wheel event
+     */
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         // Create and execute wheel action
@@ -89,6 +131,11 @@ public class MouseActionManager implements MouseListener, MouseMotionListener, M
         wheelAction.actionPerformed(null);
     }
 
+    /**
+     * Returns the state of the right mouse button.
+     *
+     * @return true if the right mouse button is pressed
+     */
     public boolean isRightMouseButton() {
         return isRightMouseButton;
     }

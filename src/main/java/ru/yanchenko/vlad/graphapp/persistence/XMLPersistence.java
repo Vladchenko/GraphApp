@@ -28,6 +28,16 @@ import java.util.logging.Logger;
 
 import static ru.yanchenko.vlad.graphapp.NumberUtils.isInteger;
 
+/**
+ * XML-based implementation of {@link Persistable} using SAX parsing.
+ * <p>
+ * Reads graph data via {@code DefaultHandler} callbacks and writes
+ * using DOM serialization with indented output. Vertex links are stored
+ * as child elements of the vertex element.
+ *
+ * @see Persistable
+ * @see DefaultHandler
+ */
 public class XMLPersistence extends DefaultHandler implements Persistable {
 
     private static final String LINK_ATTRIBUTE_NAME = "link";
@@ -39,6 +49,12 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
     private int currentVertex1 = -1;
     private GraphDomainService graphService;
 
+    /**
+     * Loads graph data from an XML file using SAX parsing.
+     *
+     * @param graphService the graph domain service to populate
+     * @throws ParserConfigurationException if XML parser configuration fails
+     */
     @Override
     public void loadFromFile(GraphDomainService graphService) throws ParserConfigurationException {
         this.graphService = graphService;
@@ -64,6 +80,11 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
         }
     }
 
+    /**
+     * Saves graph data to an XML file using DOM serialization.
+     *
+     * @param graphService the graph domain service to save
+     */
     @Override
     public void saveToFile(GraphDomainService graphService) {
         this.graphService = graphService;

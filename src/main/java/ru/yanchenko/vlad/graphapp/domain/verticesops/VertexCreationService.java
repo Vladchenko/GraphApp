@@ -14,6 +14,12 @@ public class VertexCreationService {
 	private final ScreenData screenData;
 	private final VertexValidationService vertexValidationService;
 
+	/**
+	 * Creates a VertexCreationService with the specified screen data and validation service.
+	 *
+	 * @param screenData the screen data
+	 * @param vertexValidationService the vertex validation service
+	 */
 	public VertexCreationService(ScreenData screenData, VertexValidationService vertexValidationService) {
 		this.screenData = screenData;
 		this.vertexValidationService = vertexValidationService;

@@ -24,6 +24,14 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
     private final GraphUiStateService uiStateService; // UI state
     private final KeyboardState keyboardState;
 
+    /**
+     * Creates a MouseMotionListenerImpl with the specified dependencies.
+     *
+     * @param drawingTimer the drawing timer
+     * @param graphService the graph domain service
+     * @param uiStateService the UI state service
+     * @param keyboardState the keyboard state
+     */
     public MouseMotionListenerImpl(DrawingTimer drawingTimer,
                                    GraphDomainService graphService,
                                    GraphUiStateService uiStateService,
@@ -34,6 +42,11 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
         this.keyboardState = keyboardState;
     }
 
+    /**
+     * Handles mouse drag events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mouseDragged(MouseEvent e) {
         try {
@@ -54,6 +67,11 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
         }
     }
 
+    /**
+     * Handles mouse move events.
+     *
+     * @param e the mouse event
+     */
     @Override
     public void mouseMoved(MouseEvent e) {
         try {

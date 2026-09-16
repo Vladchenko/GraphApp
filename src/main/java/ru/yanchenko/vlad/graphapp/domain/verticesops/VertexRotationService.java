@@ -9,12 +9,23 @@ import java.util.List;
 import static ru.yanchenko.vlad.graphapp.geometry.Geometry.toCartesian;
 import static ru.yanchenko.vlad.graphapp.geometry.Geometry.toPolar;
 
+/**
+ * Service for rotating vertices around the screen center using polar coordinates.
+ * <p>
+ * Converts vertex positions to polar coordinates, increments their angle,
+ * and converts back to Cartesian coordinates to achieve circular rotation.
+ */
 public class VertexRotationService {
 
     public static final double RADIAN_INCREMENT = 0.01;
 
     private final ScreenData screenData;
 
+    /**
+     * Creates a VertexRotationService with the specified screen data.
+     *
+     * @param screenData the screen data containing center point
+     */
     public VertexRotationService(ScreenData screenData) {
         this.screenData = screenData;
     }

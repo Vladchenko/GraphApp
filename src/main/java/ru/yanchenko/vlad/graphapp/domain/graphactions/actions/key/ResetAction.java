@@ -20,6 +20,13 @@ public class ResetAction extends GraphAction {
     private final GraphUiState uiState;
     private final VertexPopulationService vertexPopulationService;
 
+    /**
+     * Creates a ResetAction with the specified context and service.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     * @param vertexPopulationService the vertex population service
+     */
     public ResetAction(GraphActionContext context,
                        GraphUiState uiState,
                        VertexPopulationService vertexPopulationService) {
@@ -29,6 +36,11 @@ public class ResetAction extends GraphAction {
         this.vertexPopulationService = vertexPopulationService;
     }
 
+    /**
+     * Handles the reset graph action.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         try {

@@ -10,12 +10,28 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+/**
+ * Handles mouse click events for vertex selection and link creation initiation.
+ * <p>
+ * Detects clicks on vertices and updates the UI state to reflect
+ * the selected vertex, enabling subsequent drag or link operations.
+ *
+ * @see GraphAction
+ * @see MouseDragAction
+ */
 public class MouseClickAction extends GraphAction {
 
     private final GraphActionContext context;
     private final GraphUiState uiState;
     private final MouseEvent mouseEvent;
 
+    /**
+     * Creates a MouseClickAction with the specified context and event.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     * @param mouseEvent the mouse event
+     */
     public MouseClickAction(GraphActionContext context, GraphUiState uiState, MouseEvent mouseEvent) {
         super("Mouse Click");
         this.context = context;
@@ -23,6 +39,11 @@ public class MouseClickAction extends GraphAction {
         this.mouseEvent = mouseEvent;
     }
 
+    /**
+     * Handles the mouse click event.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();

@@ -14,6 +14,17 @@ import ru.yanchenko.vlad.graphapp.presentation.DrawingPanel;
 import javax.swing.*;
 import java.awt.event.KeyListener;
 
+/**
+ * Entry point for the Graph Application.
+ * <p>
+ * Initializes the Dagger dependency injection component, populates
+ * the graph based on {@link AppConfig#getPopulationKind()}, and sets up
+ * the Swing UI with key and mouse bindings.
+ *
+ * @see AppConfig
+ * @see GraphAppComponent
+ * @see DrawingPanel
+ */
 public class GraphApp {
     public static void main(String[] args) {
         GraphAppComponent daggerComponent = DaggerGraphAppComponent.create();

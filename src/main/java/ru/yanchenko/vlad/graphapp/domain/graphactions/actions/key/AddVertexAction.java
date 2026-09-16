@@ -17,12 +17,23 @@ public class AddVertexAction extends GraphAction {
     private final GraphActionContext context;
     private final GraphUiState uiState;
 
+    /**
+     * Creates an AddVertexAction with the specified context and state.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     */
     public AddVertexAction(GraphActionContext context, GraphUiState uiState) {
         super("Add Vertex");
         this.context = context;
         this.uiState = uiState;
     }
 
+    /**
+     * Handles the add vertex action.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!uiState.isEditingVertex()) {

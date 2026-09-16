@@ -33,6 +33,13 @@ import java.awt.event.MouseMotionListener;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Dagger module that provides all dependencies for the GraphApp.
+ * <p>
+ * Configures singleton bindings for services, UI components, actions,
+ * and domain objects. Uses {@link PopulationKind} from {@link AppConfig}
+ * to select the appropriate vertex population strategy.
+ */
 @Module
 public class GraphAppModule {
 

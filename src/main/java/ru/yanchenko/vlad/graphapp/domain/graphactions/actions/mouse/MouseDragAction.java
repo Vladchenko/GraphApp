@@ -12,6 +12,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+/**
+ * Handles mouse drag events for vertex repositioning and link preview.
+ * <p>
+ * When Ctrl is held, draws a preview line from the selected vertex to the cursor.
+ * When Ctrl is not held, drags the selected vertex to the new position.
+ *
+ * @see GraphAction
+ * @see MouseClickAction
+ * @see MouseReleaseAction
+ */
 public class MouseDragAction extends GraphAction {
 
     private final GraphActionContext context;
@@ -19,6 +29,13 @@ public class MouseDragAction extends GraphAction {
     private final MouseEvent mouseEvent;
     private final VertexPossibleLink defaultPossibleLink;
 
+    /**
+     * Creates a MouseDragAction with the specified context and event.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     * @param mouseEvent the mouse event
+     */
     public MouseDragAction(GraphActionContext context, GraphUiState uiState, MouseEvent mouseEvent) {
         super("Mouse Drag");
         this.context = context;
@@ -27,6 +44,11 @@ public class MouseDragAction extends GraphAction {
         defaultPossibleLink = new VertexPossibleLink();
     }
 
+    /**
+     * Handles the mouse drag event.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         // NEW: Use services directly instead of legacy VerticesData

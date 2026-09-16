@@ -19,16 +19,31 @@ import static ru.yanchenko.vlad.graphapp.domain.verticesops.VertexRotationServic
 public class RotateAction extends GraphAction {
     private static final Logger LOGGER = Logger.getLogger(RotateAction.class.getName());
 
+    /**
+     * Rotation direction enum.
+     */
     public enum Direction {
+        /** Clockwise rotation */
         CLOCKWISE(-RADIAN_INCREMENT),
+        /** Counter-clockwise rotation */
         COUNTER_CLOCKWISE(RADIAN_INCREMENT);
 
         private final double increment;
 
+        /**
+         * Creates a Direction with the specified increment.
+         *
+         * @param increment the radian increment for this direction
+         */
         Direction(double increment) {
             this.increment = increment;
         }
 
+        /**
+         * Returns the radian increment for this direction.
+         *
+         * @return the increment value
+         */
         public double getIncrement() {
             return increment;
         }
@@ -40,6 +55,15 @@ public class RotateAction extends GraphAction {
     private final GraphDomainService graphService;
     private final VertexRotationService vertexRotationService;
 
+    /**
+     * Creates a RotateAction with the specified parameters.
+     *
+     * @param direction the rotation direction
+     * @param uiData the UI data
+     * @param uiState the UI state
+     * @param graphService the graph domain service
+     * @param vertexRotationService the vertex rotation service
+     */
     public RotateAction(Direction direction,
                         GraphUiData uiData,
                         GraphUiState uiState,
@@ -53,6 +77,11 @@ public class RotateAction extends GraphAction {
         this.vertexRotationService = vertexRotationService;
     }
 
+    /**
+     * Handles the rotate action.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         List<VertexPolarCoordinate> polarCoordinates = uiData.getPolarCoordinates();
@@ -91,6 +120,11 @@ public class RotateAction extends GraphAction {
                 && !uiState.isDeletingVertex();
     }
 
+    /**
+     * Returns the rotation direction.
+     *
+     * @return the direction
+     */
     public Direction getDirection() {
         return direction;
     }

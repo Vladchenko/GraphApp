@@ -11,15 +11,36 @@ import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Strategy that loads vertices from a file and applies a circular layout.
+ * <p>
+ * Uses {@link Persistable} to read vertex data, then positions them
+ * evenly around a circle via the provided layout strategy.
+ *
+ * @see VertexPopulationStrategy
+ * @see Persistable
+ */
 public class CircularFileStrategy implements VertexPopulationStrategy {
     private final Persistable persistable;
     private final Consumer<List<Vertex>> layoutStrategy;
 
+    /**
+     * Creates a CircularFileStrategy with the specified persistence and layout strategy.
+     *
+     * @param persistable the persistence service for loading from file
+     * @param layoutStrategy the layout strategy to apply after loading
+     */
     public CircularFileStrategy(Persistable persistable, Consumer<List<Vertex>> layoutStrategy) {
         this.persistable = persistable;
         this.layoutStrategy = layoutStrategy;
     }
 
+    /**
+     * Loads vertices from file and applies circular layout.
+     *
+     * @param graphService the graph domain service to populate
+     * @param uiState the UI state to update
+     */
     @Override
     public void populate(GraphDomainService graphService, GraphUiState uiState) {
         try {

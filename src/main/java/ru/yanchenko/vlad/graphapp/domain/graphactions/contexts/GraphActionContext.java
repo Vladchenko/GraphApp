@@ -13,6 +13,14 @@ public class GraphActionContext {
     private final RefreshService refreshService;
     private final PopulationKind populationKind;
 
+    /**
+     * Creates a GraphActionContext with the specified services and configuration.
+     *
+     * @param graphService the graph domain service
+     * @param uiStateService the UI state service
+     * @param refreshService the refresh service
+     * @param populationKind the population kind
+     */
     public GraphActionContext(GraphDomainService graphService,
                               GraphUiStateService uiStateService,
                               RefreshService refreshService,
@@ -24,10 +32,32 @@ public class GraphActionContext {
     }
 
     // NEW: Direct access to services
+    /**
+     * Returns the graph domain service.
+     *
+     * @return the graph domain service
+     */
     public GraphDomainService getGraphService() { return graphService; }
+
+    /**
+     * Returns the UI state service.
+     *
+     * @return the UI state service
+     */
     public GraphUiStateService getUiStateService() { return uiStateService; }
 
     // Keep existing methods for backward compatibility
+    /**
+     * Returns the refresh service.
+     *
+     * @return the refresh service
+     */
     public RefreshService getRefreshService() { return refreshService; }
+
+    /**
+     * Returns the population kind.
+     *
+     * @return the population kind
+     */
     public PopulationKind getPopulationKind() { return populationKind; }
 }

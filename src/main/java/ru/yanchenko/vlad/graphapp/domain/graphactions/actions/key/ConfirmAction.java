@@ -29,6 +29,14 @@ public class ConfirmAction extends GraphAction {
     private final VertexLayoutService vertexLayoutService;
     private final VertexCreationService vertexCreationService;
 
+    /**
+     * Creates a ConfirmAction with the specified context and services.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     * @param vertexLayoutService the vertex layout service
+     * @param vertexCreationService the vertex creation service
+     */
     public ConfirmAction(GraphActionContext context,
                          GraphUiState uiState,
                          VertexLayoutService vertexLayoutService,
@@ -40,6 +48,11 @@ public class ConfirmAction extends GraphAction {
         this.vertexCreationService = vertexCreationService;
     }
 
+    /**
+     * Handles the confirm action.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         // NEW: Use services directly

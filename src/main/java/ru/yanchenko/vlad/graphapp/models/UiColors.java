@@ -2,6 +2,12 @@ package ru.yanchenko.vlad.graphapp.models;
 
 import java.awt.*;
 
+/**
+ * Constants for all UI colors used in the graph drawing panel.
+ * <p>
+ * Covers colors for vertex arcs (inner/outer), links, names,
+ * selection states, and debug overlays.
+ */
 public class UiColors {
     public static final Color ARCS_OUTER_COLOR = new Color(150, 255, 150);
     public static final Color ARCS_INNER_COLOR = new Color(0, 0, 0);

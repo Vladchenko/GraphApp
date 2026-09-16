@@ -19,6 +19,12 @@ public class CancelAction extends GraphAction {
     private final EditActionContext editContext;
     private final GraphUiState uiState;
 
+    /**
+     * Creates a CancelAction with the specified context and state.
+     *
+     * @param editContext the edit action context
+     * @param uiState the UI state
+     */
     public CancelAction(EditActionContext editContext, GraphUiState uiState) {
         super("Cancel");
         this.editContext = editContext;
@@ -26,6 +32,11 @@ public class CancelAction extends GraphAction {
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }
 
+    /**
+     * Handles the cancel action.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         try {

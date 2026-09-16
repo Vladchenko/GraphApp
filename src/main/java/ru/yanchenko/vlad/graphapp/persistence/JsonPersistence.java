@@ -19,16 +19,34 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * JSON-based implementation of {@link Persistable} using Jackson.
+ * <p>
+ * Serializes and deserializes graph data (vertices and edges) to/from
+ * a JSON file. Vertex names and coordinates are stored; edges are stored
+ * by vertex name and resolved to indices on load.
+ *
+ * @see Persistable
+ * @see ObjectMapper
+ */
 public class JsonPersistence implements Persistable {
 
     private static final Logger LOGGER = Logger.getLogger(JsonPersistence.class.getName());
     private final ObjectMapper objectMapper;
 
+    /**
+     * Creates a JsonPersistence with a configured ObjectMapper.
+     */
     public JsonPersistence() {
         this.objectMapper = new ObjectMapper();
         this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
 
+    /**
+     * Loads graph data from a JSON file.
+     *
+     * @param graphService the graph domain service to populate
+     */
     @Override
     public void loadFromFile(GraphDomainService graphService) {
         try {
@@ -85,6 +103,11 @@ public class JsonPersistence implements Persistable {
         }
     }
 
+    /**
+     * Saves graph data to a JSON file.
+     *
+     * @param graphService the graph domain service to save
+     */
     @Override
     public void saveToFile(GraphDomainService graphService) {
         try {

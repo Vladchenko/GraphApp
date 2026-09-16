@@ -12,6 +12,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.List;
 
+/**
+ * Handles mouse release events to finalize vertex selection and link creation/deletion.
+ * <p>
+ * Left-click adds a link between two vertices; right-click removes it.
+ *
+ * @see GraphAction
+ * @see MouseClickAction
+ * @see MouseDragAction
+ */
 public class MouseReleaseAction extends GraphAction {
 
     private final GraphActionContext context;
@@ -19,6 +28,14 @@ public class MouseReleaseAction extends GraphAction {
     private final MouseEvent mouseEvent;
     private final boolean isRightMouseButton;
 
+    /**
+     * Creates a MouseReleaseAction with the specified context and event.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     * @param mouseEvent the mouse event
+     * @param isRightMouseButton true if the right mouse button was released
+     */
     public MouseReleaseAction(GraphActionContext context,
                               GraphUiState uiState,
                               MouseEvent mouseEvent,
@@ -30,6 +47,11 @@ public class MouseReleaseAction extends GraphAction {
         this.isRightMouseButton = isRightMouseButton;
     }
 
+    /**
+     * Handles the mouse release event.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();

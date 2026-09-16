@@ -25,6 +25,14 @@ public class DeleteVertexAction extends GraphAction {
     private final VertexLayoutService vertexLayoutService;
     private final VertexDeletionService vertexDeletionService;
 
+    /**
+     * Creates a DeleteVertexAction with the specified context and services.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     * @param vertexLayoutService the vertex layout service
+     * @param vertexDeletionService the vertex deletion service
+     */
     public DeleteVertexAction(GraphActionContext context,
                               GraphUiState uiState,
                               VertexLayoutService vertexLayoutService,
@@ -38,6 +46,11 @@ public class DeleteVertexAction extends GraphAction {
         putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, KeyEvent.META_DOWN_MASK));
     }
 
+    /**
+     * Handles the delete vertex action.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
 

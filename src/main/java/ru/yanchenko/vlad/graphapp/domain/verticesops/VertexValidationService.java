@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Service for validating vertex operations, primarily duplicate name checks.
+ * <p>
+ * Ensures that no two vertices share the same name before allowing insertion.
+ */
 public class VertexValidationService {
 
     /**

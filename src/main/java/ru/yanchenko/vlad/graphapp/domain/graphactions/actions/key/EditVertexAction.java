@@ -18,12 +18,23 @@ public class EditVertexAction extends GraphAction {
     private final GraphActionContext context;
     private final GraphUiState uiState;
 
+    /**
+     * Creates an EditVertexAction with the specified context and state.
+     *
+     * @param context the graph action context
+     * @param uiState the UI state
+     */
     public EditVertexAction(GraphActionContext context, GraphUiState uiState) {
         super("Edit Vertex");
         this.context = context;
         this.uiState = uiState;
     }
 
+    /**
+     * Handles the edit vertex action.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (!canStartEditing()) {

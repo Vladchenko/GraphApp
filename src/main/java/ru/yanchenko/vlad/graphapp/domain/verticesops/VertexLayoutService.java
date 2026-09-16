@@ -12,6 +12,11 @@ public class VertexLayoutService {
 
     private final Consumer<List<Vertex>> layoutStrategy;
 
+    /**
+     * Creates a VertexLayoutService with the specified layout strategy.
+     *
+     * @param layoutStrategy the layout strategy consumer
+     */
     public VertexLayoutService(Consumer<List<Vertex>> layoutStrategy) {
         this.layoutStrategy = layoutStrategy;
     }

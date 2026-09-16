@@ -7,10 +7,18 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.contexts;
 public class RefreshService {
     private Runnable refreshCallback;
 
+    /**
+     * Sets the refresh callback.
+     *
+     * @param refreshCallback the callback to invoke on refresh
+     */
     public void setRefreshCallback(Runnable refreshCallback) {
         this.refreshCallback = refreshCallback;
     }
 
+    /**
+     * Triggers a refresh by invoking the callback.
+     */
     public void refresh() {
         if (refreshCallback != null) {
             refreshCallback.run();

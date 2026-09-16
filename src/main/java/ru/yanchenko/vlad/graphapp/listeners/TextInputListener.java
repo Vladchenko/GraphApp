@@ -17,11 +17,22 @@ public class TextInputListener implements KeyListener {
     private final DrawingTimer drawingTimer;
     private final GraphUiState uiState; // UI state
 
+    /**
+     * Creates a TextInputListener with the specified dependencies.
+     *
+     * @param drawingTimer the drawing timer
+     * @param uiState the UI state
+     */
     public TextInputListener(DrawingTimer drawingTimer, GraphUiState uiState) {
         this.drawingTimer = drawingTimer;
         this.uiState = uiState;
     }
 
+    /**
+     * Handles key typed events.
+     *
+     * @param e the key event
+     */
     @Override
     public void keyTyped(KeyEvent e) {
         try {
@@ -43,6 +54,11 @@ public class TextInputListener implements KeyListener {
         }
     }
 
+    /**
+     * Handles key pressed events.
+     *
+     * @param e the key event
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         try {
@@ -73,6 +89,11 @@ public class TextInputListener implements KeyListener {
         }
     }
 
+    /**
+     * Handles key released events.
+     *
+     * @param e the key event
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         // Handle key release events if needed

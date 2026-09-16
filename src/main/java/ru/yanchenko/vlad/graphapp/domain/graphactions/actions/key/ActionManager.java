@@ -13,6 +13,20 @@ public class ActionManager {
 
     private final List<GraphAction> actions = new ArrayList<>();
 
+    /**
+     * Creates an ActionManager with all graph actions.
+     *
+     * @param loadAction the load action
+     * @param saveAction the save action
+     * @param resetAction the reset action
+     * @param cancelAction the cancel action
+     * @param confirmAction the confirm action
+     * @param rotateClockwiseAction the clockwise rotate action
+     * @param addVertexAction the add vertex action
+     * @param editVertexAction the edit vertex action
+     * @param deleteVertexAction the delete vertex action
+     * @param rotateCounterClockwiseAction the counter-clockwise rotate action
+     */
     public ActionManager(LoadAction loadAction,
                          SaveAction saveAction,
                          ResetAction resetAction,
@@ -39,6 +53,8 @@ public class ActionManager {
 
     /**
      * Sets up key bindings for a component using InputMap/ActionMap.
+     *
+     * @param component the component to bind keys to
      */
     public void setupKeyBindings(JComponent component) {
         InputMap inputMap = component.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
@@ -112,6 +128,10 @@ public class ActionManager {
 
     /**
      * Gets an action of the specified type.
+     *
+     * @param actionClass the action class to search for
+     * @param <T> the action type
+     * @return the action if found, null otherwise
      */
     @SuppressWarnings("unchecked")
     public <T extends GraphAction> T getAction(Class<T> actionClass) {
@@ -125,6 +145,11 @@ public class ActionManager {
 
     /**
      * Gets an action of the specified type that matches a predicate.
+     *
+     * @param actionClass the action class to search for
+     * @param predicate the predicate to match
+     * @param <T> the action type
+     * @return the action if found, null otherwise
      */
     @SuppressWarnings("unchecked")
     public <T extends GraphAction> T getAction(Class<T> actionClass, java.util.function.Predicate<T> predicate) {
@@ -137,7 +162,9 @@ public class ActionManager {
     }
 
     /**
-     * Gets all actions.
+     * Gets all actions managed by this manager.
+     *
+     * @return a copy of the list of all actions
      */
     public List<GraphAction> getAllActions() {
         return new ArrayList<>(actions);

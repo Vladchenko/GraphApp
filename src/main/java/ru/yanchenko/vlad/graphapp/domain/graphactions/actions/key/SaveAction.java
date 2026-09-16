@@ -19,12 +19,23 @@ public class SaveAction extends GraphAction {
     private final FileActionContext context;
     private final GraphUiState uiState;
 
+    /**
+     * Creates a SaveAction with the specified context and state.
+     *
+     * @param context the file action context
+     * @param uiState the UI state
+     */
     public SaveAction(FileActionContext context, GraphUiState uiState) {
         super("Save Graph", KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
         this.context = context;
         this.uiState = uiState;
     }
 
+    /**
+     * Handles the save graph action.
+     *
+     * @param e the action event
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         try {
