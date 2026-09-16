@@ -11,6 +11,13 @@ import java.util.List;
  */
 public class ActionManager {
 
+    // Action key names for InputMap/ActionMap bindings
+    private static final String ADD_VERTEX_KEY = "AddVertexAction";
+    private static final String DELETE_VERTEX_KEY = "DeleteVertexAction";
+    private static final String EDIT_VERTEX_KEY = "EditVertexAction";
+    private static final String ROTATE_CLOCKWISE_KEY = "RotateClockwiseAction";
+    private static final String ROTATE_COUNTER_CLOCKWISE_KEY = "RotateCounterClockwiseAction";
+
     private final List<GraphAction> actions = new ArrayList<>();
 
     /**
@@ -77,43 +84,43 @@ public class ActionManager {
         // Add vertex - multiple keys
         AddVertexAction addAction = getAction(AddVertexAction.class);
         if (addAction != null) {
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), "AddVertexAction");
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), "AddVertexAction");
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK), "AddVertexAction");
-            actionMap.put("AddVertexAction", addAction);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, 0), ADD_VERTEX_KEY);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, 0), ADD_VERTEX_KEY);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, KeyEvent.SHIFT_DOWN_MASK), ADD_VERTEX_KEY);
+            actionMap.put(ADD_VERTEX_KEY, addAction);
         }
 
         // Delete vertex - multiple keys
         DeleteVertexAction deleteAction = getAction(DeleteVertexAction.class);
         if (deleteAction != null) {
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), "DeleteVertexAction");
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), "DeleteVertexAction");
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UNDERSCORE, 0), "DeleteVertexAction");
-            actionMap.put("DeleteVertexAction", deleteAction);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, 0), DELETE_VERTEX_KEY);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, 0), DELETE_VERTEX_KEY);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UNDERSCORE, 0), DELETE_VERTEX_KEY);
+            actionMap.put(DELETE_VERTEX_KEY, deleteAction);
         }
 
         // Edit vertex - multiple keys
         EditVertexAction editAction = getAction(EditVertexAction.class);
         if (editAction != null) {
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), "EditVertexAction");
-            actionMap.put("EditVertexAction", editAction);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_R, KeyEvent.CTRL_DOWN_MASK), EDIT_VERTEX_KEY);
+            actionMap.put(EDIT_VERTEX_KEY, editAction);
         }
 
         // Rotation - arrow keys
         RotateAction clockwiseAction = getAction(RotateAction.class,
                 action -> action.getDirection() == RotateAction.Direction.CLOCKWISE);
         if (clockwiseAction != null) {
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), "RotateClockwiseAction");
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), "RotateClockwiseAction");
-            actionMap.put("RotateClockwiseAction", clockwiseAction);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, 0), ROTATE_CLOCKWISE_KEY);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, 0), ROTATE_CLOCKWISE_KEY);
+            actionMap.put(ROTATE_CLOCKWISE_KEY, clockwiseAction);
         }
 
         RotateAction counterClockwiseAction = getAction(RotateAction.class,
                 action -> action.getDirection() == RotateAction.Direction.COUNTER_CLOCKWISE);
         if (counterClockwiseAction != null) {
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), "RotateCounterClockwiseAction");
-            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), "RotateCounterClockwiseAction");
-            actionMap.put("RotateCounterClockwiseAction", counterClockwiseAction);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, 0), ROTATE_COUNTER_CLOCKWISE_KEY);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, 0), ROTATE_COUNTER_CLOCKWISE_KEY);
+            actionMap.put(ROTATE_COUNTER_CLOCKWISE_KEY, counterClockwiseAction);
         }
     }
 
