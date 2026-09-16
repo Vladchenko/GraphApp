@@ -32,6 +32,16 @@ import java.util.logging.Logger;
 public class JsonPersistence implements Persistable {
 
     private static final Logger LOGGER = Logger.getLogger(JsonPersistence.class.getName());
+
+    // JSON field names
+    private static final String FIELD_VERTICES = "vertices";
+    private static final String FIELD_LINKS = "links";
+    private static final String FIELD_NAME = "name";
+    private static final String FIELD_X = "x";
+    private static final String FIELD_Y = "y";
+    private static final String FIELD_VERTEX1 = "vertex1";
+    private static final String FIELD_VERTEX2 = "vertex2";
+
     private final ObjectMapper objectMapper;
 
     /**
@@ -63,12 +73,12 @@ public class JsonPersistence implements Persistable {
             graphService.clearEdges();
 
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> verticesList = (List<Map<String, Object>>) jsonData.get("vertices");
+            List<Map<String, Object>> verticesList = (List<Map<String, Object>>) jsonData.get(FIELD_VERTICES);
             if (verticesList != null) {
                 for (Map<String, Object> vertexData : verticesList) {
-                    String name = (String) vertexData.get("name");
-                    Integer x = (Integer) vertexData.get("x");
-                    Integer y = (Integer) vertexData.get("y");
+                    String name = (String) vertexData.get(FIELD_NAME);
+                    Integer x = (Integer) vertexData.get(FIELD_X);
+                    Integer y = (Integer) vertexData.get(FIELD_Y);
 
                     if (name != null && x != null && y != null) {
                         double radius = VertexTextSizer.computeRadius(VertexFont.VERTICES_FONT, name);
@@ -78,11 +88,11 @@ public class JsonPersistence implements Persistable {
             }
 
             @SuppressWarnings("unchecked")
-            List<Map<String, Object>> linksList = (List<Map<String, Object>>) jsonData.get("links");
+            List<Map<String, Object>> linksList = (List<Map<String, Object>>) jsonData.get(FIELD_LINKS);
             if (linksList != null) {
                 for (Map<String, Object> linkData : linksList) {
-                    String vertex1Name = (String) linkData.get("vertex1");
-                    String vertex2Name = (String) linkData.get("vertex2");
+                    String vertex1Name = (String) linkData.get(FIELD_VERTEX1);
+                    String vertex2Name = (String) linkData.get(FIELD_VERTEX2);
 
                     if (vertex1Name != null && vertex2Name != null) {
                         int vertex1Index = findVertexIndexByName(graphService.getCurrentGraph().getVertices(), vertex1Name);
@@ -119,19 +129,19 @@ public class JsonPersistence implements Persistable {
             for (Vertex vertex : graphService.getCurrentGraph().getVertices()) {
                 if (!vertex.getVertexName().isEmpty()) {
                     Map<String, Object> vertexData = new HashMap<>();
-                    vertexData.put("name", vertex.getVertexName());
-                    vertexData.put("x", Math.round(vertex.getX()));
-                    vertexData.put("y", Math.round(vertex.getY()));
+                    vertexData.put(FIELD_NAME, vertex.getVertexName());
+                    vertexData.put(FIELD_X, Math.round(vertex.getX()));
+                    vertexData.put(FIELD_Y, Math.round(vertex.getY()));
                     verticesList.add(vertexData);
                 }
             }
-            jsonData.put("vertices", verticesList);
+            jsonData.put(FIELD_VERTICES, verticesList);
 
             List<Map<String, Object>> linksList = new ArrayList<>();
             for (Edge edge : graphService.getCurrentGraph().getEdges()) {
                 Map<String, Object> linkData = new HashMap<>();
-                linkData.put("vertex1", graphService.getCurrentGraph().getVertices().get(edge.from()).getVertexName());
-                linkData.put("vertex2", graphService.getCurrentGraph().getVertices().get(edge.to()).getVertexName());
+                linkData.put(FIELD_VERTEX1, graphService.getCurrentGraph().getVertices().get(edge.from()).getVertexName());
+                linkData.put(FIELD_VERTEX2, graphService.getCurrentGraph().getVertices().get(edge.to()).getVertexName());
                 linksList.add(linkData);
             }
             jsonData.put("links", linksList);

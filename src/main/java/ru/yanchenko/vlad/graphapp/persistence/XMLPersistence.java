@@ -44,6 +44,9 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
     private static final String VERTEX_ELEMENT_NAME = "Vertex";
     private static final String VERTEX_LINK_ELEMENT_NAME = "VertexLink";
     private static final String VERTEX_NAME_ATTRIBUTE_NAME = "name";
+    private static final String X_ATTRIBUTE_NAME = "x";
+    private static final String Y_ATTRIBUTE_NAME = "y";
+    private static final String ROOT_ELEMENT_NAME = "Graph";
 
     private Locator locator;
     private int currentVertex1 = -1;
@@ -96,7 +99,7 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
             // Adding a root element
             boolean addNode;
             Document doc = docBuilder.newDocument();
-            Element rootElement = doc.createElement("Graph");
+            Element rootElement = doc.createElement(ROOT_ELEMENT_NAME);
             doc.appendChild(rootElement);
 
             Node[] vertexElement = new Node[graphService.getCurrentGraph().getVertices().size()];
@@ -108,9 +111,9 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
                     vertexElement[i] = doc.createElement(VERTEX_ELEMENT_NAME);
                     ((Element) vertexElement[i]).setAttribute(VERTEX_NAME_ATTRIBUTE_NAME,
                             graphService.getCurrentGraph().getVertices().get(i).getVertexName());
-                    ((Element) vertexElement[i]).setAttribute("x",
+                    ((Element) vertexElement[i]).setAttribute(X_ATTRIBUTE_NAME,
                             Long.toString(Math.round(graphService.getCurrentGraph().getVertices().get(i).getX())));
-                    ((Element) vertexElement[i]).setAttribute("y",
+                    ((Element) vertexElement[i]).setAttribute(Y_ATTRIBUTE_NAME,
                             Long.toString(Math.round(graphService.getCurrentGraph().getVertices().get(i).getY())));
                     rootElement.appendChild(vertexElement[i]);
                 }
@@ -195,10 +198,10 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
                         graphService.getCurrentGraph().getVertices());
                 if (vertexPosition == -1) {
                     if (!atts.getLocalName(1).isBlank()
-                            && atts.getLocalName(1).equals("x")
+                            && atts.getLocalName(1).equals(X_ATTRIBUTE_NAME)
                             && isInteger(atts.getValue(1))) {
                         if (!atts.getLocalName(2).isBlank()
-                                && atts.getLocalName(2).equals("y")
+                                && atts.getLocalName(2).equals(Y_ATTRIBUTE_NAME)
                                 && isInteger(atts.getValue(2))) {
                             double radius = VertexTextSizer.computeRadius(
                                     VertexFont.VERTICES_FONT, atts.getValue(0));
@@ -219,10 +222,10 @@ public class XMLPersistence extends DefaultHandler implements Persistable {
                     currentVertex1 = graphService.getCurrentGraph().getVertices().size() - 1;
                 } else {
                     if (!atts.getLocalName(1).isBlank()
-                            && atts.getLocalName(1).equals("x")
+                            && atts.getLocalName(1).equals(X_ATTRIBUTE_NAME)
                             && isInteger(atts.getValue(1))) {
                         if (!atts.getLocalName(2).isBlank()
-                                && atts.getLocalName(2).equals("y")
+                                && atts.getLocalName(2).equals(Y_ATTRIBUTE_NAME)
                                 && isInteger(atts.getValue(2))) {
                             graphService.getCurrentGraph().getVertices().get(vertexPosition).setX(
                                     Integer.parseInt(atts.getValue(1)));
