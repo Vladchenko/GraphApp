@@ -25,6 +25,7 @@ import ru.yanchenko.vlad.graphapp.persistence.Persistable;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingPanel;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingTimer;
 import ru.yanchenko.vlad.graphapp.presentation.painter.ConnectionPointCalculator;
+import ru.yanchenko.vlad.graphapp.presentation.painter.EdgePainter;
 import ru.yanchenko.vlad.graphapp.presentation.painter.VertexPainter;
 
 import javax.inject.Named;
@@ -149,14 +150,11 @@ public class GraphAppModule {
     @Singleton
     public DrawingPanel provideDrawingPanel(GraphUiState uiState,
                                             ScreenData screenData,
+                                            EdgePainter edgePainter,
                                             VertexPainter vertexPainter,
                                             RefreshService refreshService,
-                                            GraphDomainService graphService,
-                                            GraphUiStateService uiStateService,
-                                            MouseActionManager mouseActionManager,
-                                            ConnectionPointCalculator connectionPointCalculator) {
-        return new DrawingPanel(uiState, screenData, vertexPainter, refreshService,
-                graphService, uiStateService, mouseActionManager, connectionPointCalculator);
+                                            GraphDomainService graphService) {
+        return new DrawingPanel(uiState, screenData, edgePainter, vertexPainter, refreshService, graphService);
     }
 
     @Provides
@@ -352,5 +350,15 @@ public class GraphAppModule {
             GraphUiStateService uiStateService
     ) {
         return new ConnectionPointCalculator(uiStateService.getUiState());
+    }
+
+    @Provides
+    @Singleton
+    public EdgePainter provideEdgePainter(GraphDomainService graphService,
+                                          GraphUiStateService uiStateService,
+                                          MouseActionManager mouseActionManager,
+                                          ConnectionPointCalculator connectionPointCalculator) {
+        return new EdgePainter(uiStateService.getUiData(), graphService,
+                mouseActionManager, connectionPointCalculator);
     }
 }

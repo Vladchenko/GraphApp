@@ -1,25 +1,17 @@
 package ru.yanchenko.vlad.graphapp.presentation;
 
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
-import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse.MouseActionManager;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.RefreshService;
 import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.UiColors;
-import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
-import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
-import ru.yanchenko.vlad.graphapp.presentation.painter.ConnectionPointCalculator;
+import ru.yanchenko.vlad.graphapp.presentation.painter.EdgePainter;
 import ru.yanchenko.vlad.graphapp.presentation.painter.VertexPainter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.util.Date;
-import java.util.List;
 
 /**
  * Swing panel responsible for rendering the entire graph visualization.
@@ -32,50 +24,43 @@ import java.util.List;
  * ensuring smooth animations for vertex dragging, rotation, and link creation.
  *
  * @see DrawingTimer
+ * @see EdgePainter
  * @see VertexPainter
- * @see ConnectionPointCalculator
  */
 public class DrawingPanel extends JPanel {
 
     private final GraphUiState uiState;
     private final ScreenData screenData;
+    private final EdgePainter edgePainter;
     private final VertexPainter vertexPainter;
     private final GraphDomainService graphService;
-    private final GraphUiStateService uiStateService;
-    private final MouseActionManager mouseActionManager;
-    private final ConnectionPointCalculator connectionPointCalculator;
 
     /**
      * Creates a {@code DrawingPanel} with all required dependencies.
      * <p>
      * Registers this panel's {@link #paintComponent(Graphics)} method as the refresh callback
      * on the provided {@link RefreshService}, enabling automatic repaint triggers
-     * from domain and action layers.
+     * from domain and action layers. Delegates vertex and edge rendering to
+     * {@link VertexPainter} and {@link EdgePainter} respectively.
      *
-     * @param uiState                       the current UI state (selection, edit buffer, operation flags)
-     * @param screenData                      screen dimensions and center point for positioning
-     * @param vertexPainter                   painter for rendering graph vertices
-     * @param refreshService                  service that triggers repaint via callback
-     * @param graphService                    the graph domain service providing vertex and edge data
-     * @param uiStateService                  service managing UI state and data (possible links, polar coords)
-     * @param mouseActionManager              manager for mouse event handling
-     * @param connectionPointCalculator       calculator for edge connection points on vertex boundaries
+     * @param uiState        the current UI state (selection, edit buffer, operation flags)
+     * @param screenData     screen dimensions and center point for positioning
+     * @param edgePainter    painter for rendering graph edges and edge previews
+     * @param vertexPainter  painter for rendering graph vertices
+     * @param refreshService service that triggers repaint via callback
+     * @param graphService   the graph domain service providing vertex and edge data for debug info
      */
     public DrawingPanel(GraphUiState uiState,
                         ScreenData screenData,
+                        EdgePainter edgePainter,
                         VertexPainter vertexPainter,
                         RefreshService refreshService,
-                        GraphDomainService graphService,
-                        GraphUiStateService uiStateService,
-                        MouseActionManager mouseActionManager,
-                        ConnectionPointCalculator connectionPointCalculator) {
+                        GraphDomainService graphService) {
         this.uiState = uiState;
         this.screenData = screenData;
+        this.edgePainter = edgePainter;
         this.graphService = graphService;
         this.vertexPainter = vertexPainter;
-        this.uiStateService = uiStateService;
-        this.mouseActionManager = mouseActionManager;
-        this.connectionPointCalculator = connectionPointCalculator;
 
         // Set up the refresh callback
         refreshService.setRefreshCallback(this::repaint);
@@ -89,14 +74,13 @@ public class DrawingPanel extends JPanel {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
 
-
         // Configure rendering hints
         configureRenderingHints(g2);
 
         // Draw all components
         drawCenterAxis(g2);
-        drawEdges(g2);
-        drawPossibleLink(g2);
+        edgePainter.drawEdges(g2);
+        edgePainter.drawPossibleEdge(g2);
         vertexPainter.drawVertices(g2);
         drawEditBox(g2);
         drawFrameTime(g2, beginTime);
@@ -128,102 +112,6 @@ public class DrawingPanel extends JPanel {
         g2.setColor(UiColors.CENTER_DOT_COLOR);
         Point center = screenData.getScreenCenterPoint();
         g2.drawOval(center.x - 2, center.y - 2, 4, 4);
-    }
-
-    /**
-     * Draws all edges between vertices in the current graph.
-     * <p>
-     * Iterates through all edges (converted from domain {@link Edge} objects to {@link VertexLink} objects)
-     * and calls {@link #drawEdge(Graphics2D, VertexLink, List)} for each one.
-     *
-     * @param g2 the graphics context to draw on
-     */
-    private void drawEdges(Graphics2D g2) {
-        g2.setColor(UiColors.VERTEX_LINKS_COLOR);
-        List<VertexLink> verticesLinks = graphService.convertEdgesToLinks();
-        List<Vertex> vertices = graphService.getCurrentGraph().getVertices();
-
-        for (VertexLink link : verticesLinks) {
-            drawEdge(g2, link, vertices);
-        }
-    }
-
-    /**
-     * Draws a single edge between two vertices, including connection terminators.
-     * <p>
-     * Calculates connection points on each vertex's boundary using
-     * {@link ConnectionPointCalculator#calculateConnectionPoint(Vertex, Vertex)},
-     * draws the connecting line, and renders small circles at both endpoints.
-     *
-     * @param g2         the graphics context to draw on
-     * @param link       the edge link containing source and target vertex indices
-     * @param vertices   the list of all vertices in the graph
-     */
-    private void drawEdge(Graphics2D g2, VertexLink link, List<Vertex> vertices) {
-        int link1Index = link.getLink1();
-        int link2Index = link.getLink2();
-
-        // Validate indices
-        if (link1Index >= vertices.size() || link2Index >= vertices.size()) {
-            return;
-        }
-
-        Vertex vertex1 = vertices.get(link1Index);
-        Vertex vertex2 = vertices.get(link2Index);
-
-        // Calculate connection points on vertex boundaries
-        Point2D connectionPoint1 = connectionPointCalculator.calculateConnectionPoint(vertex1, vertex2);
-        Point2D connectionPoint2 = connectionPointCalculator.calculateConnectionPoint(vertex2, vertex1);
-
-        // Draw the edge line
-        g2.drawLine(
-                (int) connectionPoint1.getX(), (int) connectionPoint1.getY(),
-                (int) connectionPoint2.getX(), (int) connectionPoint2.getY()
-        );
-
-        // Draw connection terminators
-        drawConnectionTerminator(g2, connectionPoint1);
-        drawConnectionTerminator(g2, connectionPoint2);
-    }
-
-    /**
-     * Draws a small 6x6 pixel circle at the specified connection point.
-     * <p>
-     * Used as a terminator marker at each end of an edge line to visually indicate
-     * the connection point on a vertex boundary.
-     *
-     * @param g2   the graphics context to draw on
-     * @param point the point where the terminator circle should be centered
-     */
-    private void drawConnectionTerminator(Graphics2D g2, Point2D point) {
-        g2.drawOval((int) point.getX() - 3, (int) point.getY() - 3, 6, 6);
-    }
-
-    /**
-     * Draws the preview line for a link being created by the user.
-     * <p>
-     * Renders a solid line for left-button drag or a dashed line for right-button drag,
-     * with terminator circles at both ends. The preview is read from {@link GraphUiStateService}.
-     *
-     * @param g the graphics context to draw on
-     */
-    private void drawPossibleLink(Graphics g) {
-        VertexPossibleLink link = uiStateService.getUiData().getPossibleLink();
-        Graphics2D g2 = (Graphics2D) g;
-        if (mouseActionManager.isRightMouseButton()) {
-            g2.setColor(Color.BLACK);
-            float[] dash0 = {5.0f, 15.0f};
-            g2.setStroke(new BasicStroke(10,
-                    BasicStroke.CAP_ROUND,
-                    BasicStroke.JOIN_BEVEL,
-                    2, dash0, 0.0f));
-            g2.drawLine(link.getX1(), link.getY1(), link.getX2(), link.getY2());
-        } else {
-            g2.setColor(UiColors.NEW_LINK_COLOR);
-            g2.drawLine(link.getX1(), link.getY1(), link.getX2(), link.getY2());
-            g2.drawOval(link.getX2() - 3, link.getY2() - 3, 6, 6);
-            g2.drawOval(link.getX1() - 3, link.getY1() - 3, 6, 6);
-        }
     }
 
     /**
