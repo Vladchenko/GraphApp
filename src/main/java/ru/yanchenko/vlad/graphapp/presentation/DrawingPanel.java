@@ -3,50 +3,80 @@ package ru.yanchenko.vlad.graphapp.presentation;
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse.MouseActionManager;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.RefreshService;
-import ru.yanchenko.vlad.graphapp.geometry.Geometry;
 import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.UiColors;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
+import ru.yanchenko.vlad.graphapp.presentation.painter.ConnectionPointCalculator;
+import ru.yanchenko.vlad.graphapp.presentation.painter.VertexPainter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.MultipleGradientPaint.CycleMethod;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.Date;
 import java.util.List;
 
-import static ru.yanchenko.vlad.graphapp.models.UiColors.VERTEX_BACKGROUND_COLORS;
-import static ru.yanchenko.vlad.graphapp.models.UiColors.VERTEX_BACKGROUND_COLORS_FRACTIONS;
-
 /**
- * Panel responsible for rendering the graph visualization.
+ * Swing panel responsible for rendering the entire graph visualization.
+ * <p>
+ * Acts as a thin orchestrator that delegates rendering of individual graph elements
+ * to specialized painter classes ({@link VertexPainter}, etc.). Manages rendering hints,
+ * frame timing, and debug information display.
+ * <p>
+ * The panel is continuously repainted by a {@link DrawingTimer} (3ms interval),
+ * ensuring smooth animations for vertex dragging, rotation, and link creation.
+ *
+ * @see DrawingTimer
+ * @see VertexPainter
+ * @see ConnectionPointCalculator
  */
 public class DrawingPanel extends JPanel {
 
-    private final MouseActionManager mouseActionManager;
+    private final GraphUiState uiState;
     private final ScreenData screenData;
-    private final GraphDomainService graphService; // Domain service
-    private final GraphUiStateService uiStateService; // UI state service
-    private final GraphUiState uiState; // UI state
+    private final VertexPainter vertexPainter;
+    private final GraphDomainService graphService;
+    private final GraphUiStateService uiStateService;
+    private final MouseActionManager mouseActionManager;
+    private final ConnectionPointCalculator connectionPointCalculator;
 
-    public DrawingPanel(ScreenData screenData,
-                        MouseActionManager mouseActionManager,
+    /**
+     * Creates a {@code DrawingPanel} with all required dependencies.
+     * <p>
+     * Registers this panel's {@link #paintComponent(Graphics)} method as the refresh callback
+     * on the provided {@link RefreshService}, enabling automatic repaint triggers
+     * from domain and action layers.
+     *
+     * @param uiState                       the current UI state (selection, edit buffer, operation flags)
+     * @param screenData                      screen dimensions and center point for positioning
+     * @param vertexPainter                   painter for rendering graph vertices
+     * @param refreshService                  service that triggers repaint via callback
+     * @param graphService                    the graph domain service providing vertex and edge data
+     * @param uiStateService                  service managing UI state and data (possible links, polar coords)
+     * @param mouseActionManager              manager for mouse event handling
+     * @param connectionPointCalculator       calculator for edge connection points on vertex boundaries
+     */
+    public DrawingPanel(GraphUiState uiState,
+                        ScreenData screenData,
+                        VertexPainter vertexPainter,
+                        RefreshService refreshService,
                         GraphDomainService graphService,
                         GraphUiStateService uiStateService,
-                        GraphUiState uiState,
-                        RefreshService refreshService) {
+                        MouseActionManager mouseActionManager,
+                        ConnectionPointCalculator connectionPointCalculator) {
         this.uiState = uiState;
         this.screenData = screenData;
         this.graphService = graphService;
+        this.vertexPainter = vertexPainter;
         this.uiStateService = uiStateService;
         this.mouseActionManager = mouseActionManager;
-        
+        this.connectionPointCalculator = connectionPointCalculator;
+
         // Set up the refresh callback
         refreshService.setRefreshCallback(this::repaint);
     }
@@ -67,13 +97,18 @@ public class DrawingPanel extends JPanel {
         drawCenterAxis(g2);
         drawEdges(g2);
         drawPossibleLink(g2);
-        drawVertices(g2);
+        vertexPainter.drawVertices(g2);
         drawEditBox(g2);
         drawFrameTime(g2, beginTime);
     }
 
     /**
-     * Configure rendering hints for better visual quality.
+     * Configures antialiasing and rendering quality hints on the graphics context.
+     * <p>
+     * Enables antialiasing for smooth edges, text antialiasing for readable vertex names,
+     * and sets the rendering quality to "quality" mode. Also sets the default stroke width to 2.
+     *
+     * @param g2 the graphics context to configure
      */
     private void configureRenderingHints(Graphics2D g2) {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -83,7 +118,11 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Draw the center axis point of the graph.
+     * Draws a small circle at the screen center to mark the graph's origin point.
+     * <p>
+     * The circle is 4x4 pixels, centered on the screen center point from {@link ScreenData}.
+     *
+     * @param g2 the graphics context to draw on
      */
     private void drawCenterAxis(Graphics2D g2) {
         g2.setColor(UiColors.CENTER_DOT_COLOR);
@@ -92,7 +131,12 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Draw all edges between vertices.
+     * Draws all edges between vertices in the current graph.
+     * <p>
+     * Iterates through all edges (converted from domain {@link Edge} objects to {@link VertexLink} objects)
+     * and calls {@link #drawEdge(Graphics2D, VertexLink, List)} for each one.
+     *
+     * @param g2 the graphics context to draw on
      */
     private void drawEdges(Graphics2D g2) {
         g2.setColor(UiColors.VERTEX_LINKS_COLOR);
@@ -105,7 +149,15 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Draw a single edge between two vertices.
+     * Draws a single edge between two vertices, including connection terminators.
+     * <p>
+     * Calculates connection points on each vertex's boundary using
+     * {@link ConnectionPointCalculator#calculateConnectionPoint(Vertex, Vertex)},
+     * draws the connecting line, and renders small circles at both endpoints.
+     *
+     * @param g2         the graphics context to draw on
+     * @param link       the edge link containing source and target vertex indices
+     * @param vertices   the list of all vertices in the graph
      */
     private void drawEdge(Graphics2D g2, VertexLink link, List<Vertex> vertices) {
         int link1Index = link.getLink1();
@@ -120,8 +172,8 @@ public class DrawingPanel extends JPanel {
         Vertex vertex2 = vertices.get(link2Index);
 
         // Calculate connection points on vertex boundaries
-        Point2D connectionPoint1 = calculateConnectionPoint(vertex1, vertex2);
-        Point2D connectionPoint2 = calculateConnectionPoint(vertex2, vertex1);
+        Point2D connectionPoint1 = connectionPointCalculator.calculateConnectionPoint(vertex1, vertex2);
+        Point2D connectionPoint2 = connectionPointCalculator.calculateConnectionPoint(vertex2, vertex1);
 
         // Draw the edge line
         g2.drawLine(
@@ -135,33 +187,25 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Calculate the connection point on a vertex's boundary.
-     */
-    private Point2D calculateConnectionPoint(Vertex fromVertex, Vertex toVertex) {
-        double x1 = fromVertex.getX();
-        double y1 = fromVertex.getY();
-        double x2 = toVertex.getX();
-        double y2 = toVertex.getY();
-
-        // Calculate angle between vertices
-        double angle = Geometry.computeAngle(x1, y1, x2, y2);
-
-        // Calculate connection point on vertex boundary
-        double connectionX = x1 + (fromVertex.getRadius() + uiState.getVertexLinkMargin()) * Math.cos(angle);
-        double connectionY = y1 - (fromVertex.getRadius() + uiState.getVertexLinkMargin()) * Math.sin(angle);
-
-        return new Point2D.Double(connectionX, connectionY);
-    }
-
-    /**
-     * Draw a small circle at the connection point.
+     * Draws a small 6x6 pixel circle at the specified connection point.
+     * <p>
+     * Used as a terminator marker at each end of an edge line to visually indicate
+     * the connection point on a vertex boundary.
+     *
+     * @param g2   the graphics context to draw on
+     * @param point the point where the terminator circle should be centered
      */
     private void drawConnectionTerminator(Graphics2D g2, Point2D point) {
         g2.drawOval((int) point.getX() - 3, (int) point.getY() - 3, 6, 6);
     }
 
     /**
-     * Draw the possible link being created (UI state).
+     * Draws the preview line for a link being created by the user.
+     * <p>
+     * Renders a solid line for left-button drag or a dashed line for right-button drag,
+     * with terminator circles at both ends. The preview is read from {@link GraphUiStateService}.
+     *
+     * @param g the graphics context to draw on
      */
     private void drawPossibleLink(Graphics g) {
         VertexPossibleLink link = uiStateService.getUiData().getPossibleLink();
@@ -171,7 +215,7 @@ public class DrawingPanel extends JPanel {
             float[] dash0 = {5.0f, 15.0f};
             g2.setStroke(new BasicStroke(10,
                     BasicStroke.CAP_ROUND,
-                    BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_BEVEL,
                     2, dash0, 0.0f));
             g2.drawLine(link.getX1(), link.getY1(), link.getX2(), link.getY2());
         } else {
@@ -183,136 +227,12 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Draw all vertices.
-     */
-    private void drawVertices(Graphics2D g2) {
-        List<Vertex> vertices = graphService.getCurrentGraph().getVertices();
-        for (int i = 0; i < vertices.size(); i++) {
-            Vertex vertex = vertices.get(i);
-            boolean isSelected = i == uiState.getSelectedVertexIndex();
-            drawVertex(g2, vertex, isSelected);
-        }
-    }
-
-    /**
-     * Draw a single vertex with background and text.
-     */
-    private void drawVertex(Graphics2D g2, Vertex vertex, boolean isSelected) {
-        // Draw vertex background with gradient
-        drawVertexBackground(g2, vertex);
-
-        // Draw vertex with selection-aware coloring
-        drawVertexWithSelection(g2, vertex, isSelected);
-    }
-
-    /**
-     * Draw vertex with selection-aware coloring.
-     */
-    private void drawVertexWithSelection(Graphics2D g2, Vertex vertex, boolean isSelected) {
-        // Save current color and stroke
-        Color originalColor = g2.getColor();
-        Stroke originalStroke = g2.getStroke();
-
-        try {
-            // Calculate dash pattern (extracted from Vertex logic)
-            float[] dash = calculateDashPattern(vertex);
-
-            // Draw outer arc
-            g2.setStroke(new BasicStroke(5,
-                    BasicStroke.CAP_ROUND,
-                    BasicStroke.JOIN_ROUND,
-                    1.0f, dash, dash[0] / 2));
-            g2.setColor(UiColors.ARCS_OUTER_COLOR);
-            g2.drawArc((int) (vertex.getX() - vertex.getRadius()),
-                    (int) (vertex.getY() - vertex.getRadius()),
-                    (int) vertex.getRadius() * 2,
-                    (int) vertex.getRadius() * 2, 0, 360);
-
-            // Draw inner arc with selection-aware color
-            g2.setStroke(new BasicStroke(2,
-                    BasicStroke.CAP_ROUND,
-                    BasicStroke.JOIN_ROUND,
-                    1.0f, dash, dash[0] / 2));
-
-            if (isSelected) {
-                g2.setColor(UiColors.ARCS_INNER_SELECTED_COLOR);
-            } else {
-                g2.setColor(UiColors.ARCS_INNER_COLOR);
-            }
-
-            g2.drawArc((int) (vertex.getX() - vertex.getRadius()),
-                    (int) (vertex.getY() - vertex.getRadius()),
-                    (int) vertex.getRadius() * 2,
-                    (int) vertex.getRadius() * 2, 0, 360);
-
-            // Draw vertex text
-            g2.setColor(UiColors.VERTEX_NAMES_COLOR);
-            g2.setFont(VertexFont.VERTICES_FONT);
-            drawVertexText(g2, vertex);
-
-        } finally {
-            // Restore original color and stroke
-            g2.setColor(originalColor);
-            g2.setStroke(originalStroke);
-        }
-    }
-
-    /**
-     * Calculate dash pattern for vertex arcs.
-     */
-    private float[] calculateDashPattern(Vertex vertex) {
-        String vertexName = vertex.getVertexName();
-        double circleDiameter = 2 * Math.PI * vertex.getRadius();
-        float arcBlank = 16;
-        if (vertexName.length() == 1) {
-            arcBlank = 0;
-        }
-        float arc = (float) ((circleDiameter / vertexName.length()) - arcBlank);
-
-        return new float[]{arc, arcBlank};
-    }
-
-    /**
-     * Draw vertex text.
-     */
-    private void drawVertexText(Graphics2D g2, Vertex vertex) {
-        String vertexName = vertex.getVertexName();
-
-        if (vertexName.length() == 1) {
-            g2.drawString(vertexName,
-                    (int) (vertex.getX() - vertex.getRadius() / 2 + 1 - vertexName.length() * 1.5 + 3),
-                    (int) (vertex.getY() + 10 - 1));
-        } else {
-            g2.drawString(vertexName,
-                    (int) (vertex.getX() - vertex.getRadius() / 2 - vertexName.length() * 1.5),
-                    (int) (vertex.getY() + 10 - 1));
-        }
-    }
-
-    /**
-     * Draw the gradient background for a vertex.
-     */
-    private void drawVertexBackground(Graphics2D g2, Vertex vertex) {
-        Point2D center = new Point2D.Float((float) vertex.getX(), (float) vertex.getY());
-        RadialGradientPaint gradientPaint = new RadialGradientPaint(
-                center,
-                (float) vertex.getRadius(),
-                VERTEX_BACKGROUND_COLORS_FRACTIONS,
-                VERTEX_BACKGROUND_COLORS,
-                CycleMethod.REPEAT
-        );
-
-        g2.setPaint(gradientPaint);
-        g2.fill(new Ellipse2D.Double(
-                vertex.getX() - vertex.getRadius(),
-                vertex.getY() - vertex.getRadius(),
-                vertex.getRadius() * 2,
-                vertex.getRadius() * 2
-        ));
-    }
-
-    /**
-     * Draw the edit box when adding or editing a vertex (UI state).
+     * Draws a semi-transparent edit box at the screen center when adding or editing a vertex.
+     * <p>
+     * Displays the current edit buffer text within a rounded rectangle. When in editing mode,
+     * renders a blinking cursor at the end of the text.
+     *
+     * @param g2 the graphics context to draw on
      */
     private void drawEditBox(Graphics2D g2) {
         if (!uiState.isAddingVertex() && !uiState.isEditingVertex()) {
@@ -359,7 +279,13 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Draw a blinking cursor in the edit box.
+     * Draws a blinking cursor at the specified position.
+     * <p>
+     * The cursor blinks every 500ms by toggling visibility based on {@link System#currentTimeMillis()}.
+     *
+     * @param g2 the graphics context to draw on
+     * @param x  the x-coordinate of the cursor
+     * @param y  the y-coordinate of the cursor top
      */
     private void drawCursor(Graphics2D g2, int x, int y) {
         long currentTime = System.currentTimeMillis();
@@ -373,7 +299,13 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Draw frame time information (UI state).
+     * Draws the current frame rendering time in the top-right corner.
+     * <p>
+     * Calculates elapsed time since {@code beginTime} (captured at the start of {@link #paintComponent(Graphics)})
+     * and displays it in milliseconds. If debug mode is enabled, also shows additional debug info.
+     *
+     * @param g2        the graphics context to draw on
+     * @param beginTime the time (ms) when painting started
      */
     private void drawFrameTime(Graphics2D g2, long beginTime) {
         g2.setColor(UiColors.FRAME_TIME_COLOR);
@@ -392,7 +324,11 @@ public class DrawingPanel extends JPanel {
     }
 
     /**
-     * Draw debug information (UI state).
+     * Draws debug information in the top-left corner when debug mode is enabled.
+     * <p>
+     * Displays vertex count, edge count, selected vertex index, and current edit buffer content.
+     *
+     * @param g2 the graphics context to draw on
      */
     private void drawDebugInfo(Graphics2D g2) {
         g2.setColor(UiColors.FRAME_TIME_COLOR);

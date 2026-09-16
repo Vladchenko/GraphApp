@@ -24,6 +24,8 @@ import ru.yanchenko.vlad.graphapp.persistence.JsonPersistence;
 import ru.yanchenko.vlad.graphapp.persistence.Persistable;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingPanel;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingTimer;
+import ru.yanchenko.vlad.graphapp.presentation.painter.ConnectionPointCalculator;
+import ru.yanchenko.vlad.graphapp.presentation.painter.VertexPainter;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -147,11 +149,14 @@ public class GraphAppModule {
     @Singleton
     public DrawingPanel provideDrawingPanel(GraphUiState uiState,
                                             ScreenData screenData,
+                                            VertexPainter vertexPainter,
+                                            RefreshService refreshService,
                                             GraphDomainService graphService,
                                             GraphUiStateService uiStateService,
                                             MouseActionManager mouseActionManager,
-                                            RefreshService refreshService) {
-        return new DrawingPanel(screenData, mouseActionManager, graphService, uiStateService, uiState, refreshService);
+                                            ConnectionPointCalculator connectionPointCalculator) {
+        return new DrawingPanel(uiState, screenData, vertexPainter, refreshService,
+                graphService, uiStateService, mouseActionManager, connectionPointCalculator);
     }
 
     @Provides
@@ -331,5 +336,21 @@ public class GraphAppModule {
     @Singleton
     public GraphUiStateService provideGraphUiStateService(GraphUiState uiState) {
         return new GraphUiStateService(uiState);
+    }
+
+    @Provides
+    @Singleton
+    public VertexPainter provideVertexPainter(GraphDomainService graphService,
+                                              GraphUiStateService uiStateService,
+                                              ConnectionPointCalculator connectionPointCalculator) {
+        return new VertexPainter(connectionPointCalculator, graphService, uiStateService.getUiState());
+    }
+
+    @Provides
+    @Singleton
+    public ConnectionPointCalculator provideConnectionPointCalculator(
+            GraphUiStateService uiStateService
+    ) {
+        return new ConnectionPointCalculator(uiStateService.getUiState());
     }
 }
