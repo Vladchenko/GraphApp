@@ -14,6 +14,6 @@ public class UiColors {
     public static final Color NEW_LINK_COLOR = new Color(100, 255, 100);
     public static final Color FRAME_TIME_COLOR = new Color(200, 200, 200);
     public static final float[] VERTEX_BACKGROUND_COLORS_FRACTIONS = {0.03f, 0.95f};
-    public static final Color[] VERTEX_BACKGROUND_COLORS = {new Color(0.5f, 0.5f, 0.5f, 0.95f),
+    public static final Color[] VERTEX_BACKGROUND_COLORS = {new Color(0.6f, 0.6f, 0.5f, 0.90f),
             new Color(0.0f, 0.0f, 0.0f, 0.9f)};
 }
