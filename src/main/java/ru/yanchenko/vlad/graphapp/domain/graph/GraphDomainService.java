@@ -111,10 +111,21 @@ public class GraphDomainService {
 
     /**
      * Adds an edge to the graph.
+     * <p>
+     * Validates that both vertex indices are non-negative and within the
+     * current vertex list bounds.
      *
      * @param edge the edge to add
+     * @throws IllegalArgumentException if edge indices are negative
+     * @throws IndexOutOfBoundsException if edge indices exceed vertex count
      */
     public void addEdge(Edge edge) {
+        if (edge.from() < 0 || edge.to() < 0) {
+            throw new IllegalArgumentException("Edge indices must be non-negative: " + edge);
+        }
+        if (edge.from() >= currentGraph.getVertices().size() || edge.to() >= currentGraph.getVertices().size()) {
+            throw new IndexOutOfBoundsException("Edge references non-existent vertex: " + edge);
+        }
         currentGraph.getEdges().add(edge);
     }
 

@@ -2,9 +2,9 @@ package ru.yanchenko.vlad.graphapp.listeners;
 
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.geometry.Geometry;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 import ru.yanchenko.vlad.graphapp.presentation.DrawingTimer;
 
 import java.awt.event.MouseEvent;
@@ -87,7 +87,8 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      * Handle vertex dragging when Ctrl key is pressed.
      */
     private void handleVertexDragging(MouseEvent e) {
-        int chosenVertex = uiStateService.getUiData().getCurrentLink().getLink1();
+        Edge currentEdge = uiStateService.getUiData().getEdgeBeingCreated();
+        int chosenVertex = currentEdge.from();
         List<Vertex> verticesList = graphService.getCurrentGraph().getVertices();
 
         if (chosenVertex != -1 && chosenVertex < verticesList.size()) {
@@ -103,17 +104,17 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      * Handle link creation preview when dragging from a vertex.
      */
     private void handleLinkCreation(MouseEvent e) {
-        int chosenVertex = uiStateService.getUiData().getCurrentLink().getLink1();
-        VertexLink vertexLink = uiStateService.getUiData().getCurrentLink();
+        Edge currentEdge = uiStateService.getUiData().getEdgeBeingCreated();
+        int chosenVertex = currentEdge.from();
         List<Vertex> verticesList = graphService.getCurrentGraph().getVertices();
 
         if (chosenVertex == -1 || chosenVertex >= verticesList.size()) {
             return;
         }
 
-        vertexLink.setLink2(-1);
+        uiStateService.setEdgeBeingCreated(new Edge(chosenVertex, -1));
 
-        Vertex sourceVertex = verticesList.get(vertexLink.getLink1());
+        Vertex sourceVertex = verticesList.get(currentEdge.from());
         double subjectX1 = sourceVertex.getX();
         double subjectY1 = sourceVertex.getY();
 
@@ -177,8 +178,9 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      * Check for intersections with other vertices and adjust terminators.
      */
     private void checkVertexIntersections(MouseEvent e, double subjectX1, double subjectY1, Vertex sourceVertex) {
+        Edge currentEdge = uiStateService.getUiData().getEdgeBeingCreated();
         List<Vertex> verticesList = graphService.getCurrentGraph().getVertices();
-        int sourceIndex = uiStateService.getUiData().getCurrentLink().getLink1();
+        int sourceIndex = currentEdge.from();
 
         for (int i = 0; i < verticesList.size(); i++) {
             Vertex vertex = verticesList.get(i);

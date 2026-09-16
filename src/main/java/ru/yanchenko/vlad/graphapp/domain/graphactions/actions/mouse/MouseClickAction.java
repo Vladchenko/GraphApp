@@ -3,6 +3,7 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key.GraphAction;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
 import ru.yanchenko.vlad.graphapp.geometry.Geometry;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 
@@ -55,7 +56,7 @@ public class MouseClickAction extends GraphAction {
                     mouseEvent.getX(), mouseEvent.getY()) <= vertex.getRadius()) {
                 // Update UI state for selection
                 uiState.setSelectedVertexIndex(i);
-                context.getUiStateService().setCurrentLink(new ru.yanchenko.vlad.graphapp.models.vertex.VertexLink(i, -1));
+                context.getUiStateService().setEdgeBeingCreated(new Edge(i, -1));
             }
         }
         context.getRefreshService().refresh();

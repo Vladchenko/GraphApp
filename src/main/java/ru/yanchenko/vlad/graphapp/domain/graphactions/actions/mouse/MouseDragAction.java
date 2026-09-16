@@ -3,9 +3,9 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key.GraphAction;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
 import ru.yanchenko.vlad.graphapp.geometry.Geometry;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
 
 import java.awt.event.ActionEvent;
@@ -53,8 +53,8 @@ public class MouseDragAction extends GraphAction {
     public void actionPerformed(ActionEvent e) {
         // NEW: Use services directly instead of legacy VerticesData
         List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
-        VertexLink currentLink = context.getUiStateService().getUiData().getCurrentLink();
-        int chosenVertex = currentLink.getLink1();
+        Edge currentEdge = context.getUiStateService().getUiData().getEdgeBeingCreated();
+        int chosenVertex = currentEdge.from();
 
         boolean ctrlDown = mouseEvent.isControlDown() || mouseEvent.isMetaDown();
 
@@ -66,10 +66,10 @@ public class MouseDragAction extends GraphAction {
             context.getUiStateService().getUiData().setPossibleLink(defaultPossibleLink);
         } else if (chosenVertex != -1) {
             // Handle link preview
-            currentLink.setLink2(-1);
+            context.getUiStateService().setEdgeBeingCreated(new Edge(chosenVertex, -1));
 
-            double subjectX1 = vertices.get(currentLink.getLink1()).getX();
-            double subjectY1 = vertices.get(currentLink.getLink1()).getY();
+            double subjectX1 = vertices.get(currentEdge.from()).getX();
+            double subjectY1 = vertices.get(currentEdge.from()).getY();
 
             // Calculate angle between vertex center and mouse cursor
             double angle = Geometry.computeAngle(subjectX1, subjectY1,
@@ -77,20 +77,20 @@ public class MouseDragAction extends GraphAction {
 
             // Set first terminator coordinates
             context.getUiStateService().getUiData().getPossibleLink().setX1(
-                    (int) (vertices.get(currentLink.getLink1()).getX() +
-                            Math.cos(angle) * (vertices.get(currentLink.getLink1()).getRadius() +
+                    (int) (vertices.get(currentEdge.from()).getX() +
+                            Math.cos(angle) * (vertices.get(currentEdge.from()).getRadius() +
                                     uiState.getVertexLinkMargin())) // Use UI state for margin
             );
 
             context.getUiStateService().getUiData().getPossibleLink().setY1(
-                    (int) (vertices.get(currentLink.getLink1()).getY() -
-                            Math.sin(angle) * (vertices.get(currentLink.getLink1()).getRadius() +
+                    (int) (vertices.get(currentEdge.from()).getY() -
+                            Math.sin(angle) * (vertices.get(currentEdge.from()).getRadius() +
                                     uiState.getVertexLinkMargin())) // Use UI state for margin
             );
 
             // Check if mouse is still within vertex area
             if (Geometry.computeDistance(subjectX1, subjectY1, mouseEvent.getX(), mouseEvent.getY()) <=
-                    vertices.get(currentLink.getLink1()).getRadius() + uiState.getVertexLinkMargin()) {
+                    vertices.get(currentEdge.from()).getRadius() + uiState.getVertexLinkMargin()) {
 
                 // Set second terminator to same as first
                 context.getUiStateService().getUiData().getPossibleLink().setX2(
@@ -112,7 +112,7 @@ public class MouseDragAction extends GraphAction {
                         mouseEvent.getX(), mouseEvent.getY()) <=
                         vertex.getRadius() + uiState.getVertexLinkMargin()) {
 
-                    if (i != currentLink.getLink1()) {
+                    if (i != currentEdge.from()) {
                         // Calculate angle to target vertex
                         double angle2 = Geometry.computeAngle(subjectX1, subjectY1,
                                 vertex.getX(), vertex.getY()) + Math.PI;
@@ -134,14 +134,14 @@ public class MouseDragAction extends GraphAction {
                                 context.getUiStateService().getUiData().getPossibleLink().getY2());
 
                         context.getUiStateService().getUiData().getPossibleLink().setX1(
-                                (int) (vertices.get(currentLink.getLink1()).getX() +
-                                        Math.cos(angle) * (vertices.get(currentLink.getLink1()).getRadius() +
+                                (int) (vertices.get(currentEdge.from()).getX() +
+                                        Math.cos(angle) * (vertices.get(currentEdge.from()).getRadius() +
                                                 uiState.getVertexLinkMargin()))
                         );
 
                         context.getUiStateService().getUiData().getPossibleLink().setY1(
-                                (int) (vertices.get(currentLink.getLink1()).getY() -
-                                        Math.sin(angle) * (vertices.get(currentLink.getLink1()).getRadius() +
+                                (int) (vertices.get(currentEdge.from()).getY() -
+                                        Math.sin(angle) * (vertices.get(currentEdge.from()).getRadius() +
                                                 uiState.getVertexLinkMargin()))
                         );
                     }

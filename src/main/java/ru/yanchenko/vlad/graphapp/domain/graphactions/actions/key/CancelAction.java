@@ -1,6 +1,7 @@
 package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.EditActionContext;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 
@@ -77,9 +78,8 @@ public class CancelAction extends GraphAction {
     private void clearDomainDataState() {
         GraphUiData graphUiData = editContext.getGraphUiData();
 
-        // Clear any ongoing link creation
-        graphUiData.getCurrentLink().setLink1(-1);
-        graphUiData.getCurrentLink().setLink2(-1);
+        // Clear any ongoing edge creation
+        graphUiData.setEdgeBeingCreated(new Edge(-1, -1));
 
         // Clear possible link preview
         graphUiData.getPossibleLink().setX1(-10);

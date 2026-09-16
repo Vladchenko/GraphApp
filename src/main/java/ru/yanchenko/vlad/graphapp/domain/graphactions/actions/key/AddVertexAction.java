@@ -1,8 +1,8 @@
 package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.GraphActionContext;
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -69,7 +69,7 @@ public class AddVertexAction extends GraphAction {
      * Clear vertex selection in domain data.
      */
     private void clearSelection() {
-        // Clear any ongoing link creation using the UI state service
-        context.getUiStateService().setCurrentLink(new VertexLink());
+        // Clear any ongoing edge creation using the UI state service
+        context.getUiStateService().setEdgeBeingCreated(new Edge(-1, -1));
     }
 }

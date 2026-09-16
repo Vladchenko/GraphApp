@@ -6,7 +6,6 @@ import ru.yanchenko.vlad.graphapp.geometry.Geometry;
 import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -56,7 +55,7 @@ public class MouseReleaseAction extends GraphAction {
     public void actionPerformed(ActionEvent e) {
         List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
         int noVertexChosen = 0;
-        VertexLink currentLink = context.getUiStateService().getUiData().getCurrentLink();
+        Edge currentEdge = context.getUiStateService().getUiData().getEdgeBeingCreated();
 
         for (int i = 0; i < vertices.size(); i++) {
             Vertex vertex = vertices.get(i);
@@ -71,19 +70,19 @@ public class MouseReleaseAction extends GraphAction {
                 uiState.setSelectedVertexIndex(i);
 
                 // Handle link creation/deletion
-                if (currentLink.getLink1() != i) {
-                    currentLink.setLink2(i);
+                if (currentEdge.from() != i) {
+                    context.getUiStateService().setEdgeBeingCreated(new Edge(currentEdge.from(), i));
 
                     if (isRightMouseButton) {
                         // Remove link using the graph service
-                        context.getGraphService().removeEdge(new Edge(currentLink.getLink1(), currentLink.getLink2()));
+                        context.getGraphService().removeEdge(new Edge(currentEdge.from(), i));
                     } else {
                         // Add link using the graph service
-                        context.getGraphService().addEdge(new Edge(currentLink.getLink1(), currentLink.getLink2()));
+                        context.getGraphService().addEdge(new Edge(currentEdge.from(), i));
                     }
                 } else {
                     // Clear link selection
-                    currentLink.setLink1(-1);
+                    context.getUiStateService().setEdgeBeingCreated(new Edge(-1, -1));
                 }
             } else {
                 noVertexChosen++;
@@ -91,15 +90,13 @@ public class MouseReleaseAction extends GraphAction {
 
             // Clear link selection if no second vertex chosen
             if (noVertexChosen == vertices.size()) {
-                currentLink.setLink1(-1);
-                currentLink.setLink2(-1);
+                context.getUiStateService().setEdgeBeingCreated(new Edge(-1, -1));
             }
         }
 
         // Reset editing state and clear possible link
         uiState.setEditingVertex(false);
-        currentLink.setLink1(-1);
-        currentLink.setLink2(-1);
+        context.getUiStateService().setEdgeBeingCreated(new Edge(-1, -1));
         context.getUiStateService().getUiData().getPossibleLink().setX1(-10);
         context.getUiStateService().getUiData().getPossibleLink().setY1(-10);
         context.getUiStateService().getUiData().getPossibleLink().setX2(-10);

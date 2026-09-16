@@ -6,7 +6,6 @@ import ru.yanchenko.vlad.graphapp.models.UiColors;
 import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiData;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
 
 import java.awt.*;
@@ -85,16 +84,16 @@ public class EdgePainter {
     /**
      * Draws all edges between vertices in the current graph.
      * <p>
-     * Iterates through all edges (converted from domain {@link Edge} objects to {@link VertexLink} objects)
-     * and calls {@link #drawEdge(Graphics2D, Edge, List)} for each one.
+     * Iterates through all domain {@link Edge} objects and calls
+     * {@link #drawEdge(Graphics2D, Edge, List)} for each one.
      *
      * @param g2 the graphics context to draw on
      */
     public void drawEdges(Graphics2D g2) {
         g2.setColor(UiColors.VERTEX_LINKS_COLOR);
         List<Vertex> vertices = graphService.getCurrentGraph().getVertices();
-        for (Edge link : graphService.getCurrentGraph().getEdges()) {
-            drawEdge(g2, link, vertices);
+        for (Edge edge : graphService.getCurrentGraph().getEdges()) {
+            drawEdge(g2, edge, vertices);
         }
     }
 

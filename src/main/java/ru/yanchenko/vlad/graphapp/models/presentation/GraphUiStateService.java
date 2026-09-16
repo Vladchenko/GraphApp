@@ -1,7 +1,7 @@
 package ru.yanchenko.vlad.graphapp.models.presentation;
 
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
 
 import java.util.List;
@@ -63,12 +63,14 @@ public class GraphUiStateService {
     }
 
     /**
-     * Sets the current link being created.
+     * Sets the edge being created by the user (e.g., via mouse drag).
+     * <p>
+     * Replaces the previous edge with a new {@link Edge} instance.
      *
-     * @param link the current link
+     * @param edge the edge being created
      */
-    public void setCurrentLink(VertexLink link) {
-        uiData.setCurrentLink(link);
+    public void setEdgeBeingCreated(Edge edge) {
+        uiData.setEdgeBeingCreated(edge);
     }
 
     /**

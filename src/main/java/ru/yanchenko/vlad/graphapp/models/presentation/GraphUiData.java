@@ -1,7 +1,7 @@
 package ru.yanchenko.vlad.graphapp.models.presentation;
 
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexLink;
 import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
 
 import java.util.ArrayList;
@@ -10,11 +10,13 @@ import java.util.List;
 /**
  * Mutable data container for the presentation layer's graph state.
  * <p>
- * Holds the current link being created, a preview of possible links,
+ * Holds the current edge being created (as an immutable {@link Edge} that is
+ * replaced on each modification), a preview of possible links,
  * and polar coordinates for each vertex used in circular layout.
  */
 public class GraphUiData {
-    private VertexLink currentLink;
+
+    private Edge edgeBeingCreated;
     private VertexPossibleLink possibleLink;
     private final List<VertexPolarCoordinate> polarCoordinates;
 
@@ -22,7 +24,7 @@ public class GraphUiData {
      * Creates a GraphUiData with default values.
      */
     public GraphUiData() {
-        this.currentLink = new VertexLink();
+        this.edgeBeingCreated = new Edge(-1, -1);
         this.possibleLink = new VertexPossibleLink();
         this.polarCoordinates = new ArrayList<>();
     }
@@ -30,25 +32,28 @@ public class GraphUiData {
     /**
      * Creates a GraphUiData with the specified values.
      *
-     * @param currentLink the current link being created
+     * @param edgeBeingCreated the current edge being created
      * @param possibleLink the possible link preview
      * @param polarCoordinates the list of polar coordinates for vertices
      */
-    public GraphUiData(VertexLink currentLink,
+    public GraphUiData(Edge edgeBeingCreated,
                        VertexPossibleLink possibleLink,
                        List<VertexPolarCoordinate> polarCoordinates) {
-        this.currentLink = currentLink;
+        this.edgeBeingCreated = edgeBeingCreated;
         this.possibleLink = possibleLink;
         this.polarCoordinates = new ArrayList<>(polarCoordinates);
     }
 
-    // Getters
     /**
-     * Returns the current link being created.
+     * Returns the edge being created by the user (e.g., via mouse drag).
+     * <p>
+     * The returned {@link Edge} is immutable — to modify it, call
+     * {@link #setEdgeBeingCreated(Edge)} with a new {@code Edge} instance.
+     * A value of {@code Edge(-1, -1)} means no edge is being created.
      *
-     * @return the current link
+     * @return the edge being created, or {@code Edge(-1, -1)} if none
      */
-    public VertexLink getCurrentLink() { return currentLink; }
+    public Edge getEdgeBeingCreated() { return edgeBeingCreated; }
 
     /**
      * Returns the possible link preview.
@@ -66,14 +71,15 @@ public class GraphUiData {
         return new ArrayList<>(polarCoordinates);
     }
 
-    // Setters for mutable approach
     /**
-     * Sets the current link being created.
+     * Sets the edge being created by the user (e.g., via mouse drag).
+     * <p>
+     * Replaces the previous edge with a new {@link Edge} instance.
      *
-     * @param currentLink the current link
+     * @param edge the edge being created
      */
-    public void setCurrentLink(VertexLink currentLink) {
-        this.currentLink = currentLink;
+    public void setEdgeBeingCreated(Edge edge) {
+        this.edgeBeingCreated = edge;
     }
 
     /**
