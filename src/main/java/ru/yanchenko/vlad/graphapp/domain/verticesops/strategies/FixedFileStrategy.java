@@ -41,7 +41,5 @@ public class FixedFileStrategy implements VertexPopulationStrategy {
         } catch (ParserConfigurationException ex) {
             Logger.getLogger(FixedFileStrategy.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-        uiState.setAddingVertex(false);
     }
 }

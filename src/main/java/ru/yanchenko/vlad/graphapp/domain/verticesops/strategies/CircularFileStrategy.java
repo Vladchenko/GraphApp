@@ -51,6 +51,5 @@ public class CircularFileStrategy implements VertexPopulationStrategy {
         if (layoutStrategy != null) {
             layoutStrategy.accept(graphService.getCurrentGraph().getVertices());
         }
-        uiState.setAddingVertex(false);
     }
 }

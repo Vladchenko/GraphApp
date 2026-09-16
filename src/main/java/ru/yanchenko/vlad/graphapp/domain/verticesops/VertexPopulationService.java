@@ -1,13 +1,10 @@
 package ru.yanchenko.vlad.graphapp.domain.verticesops;
 
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
-import ru.yanchenko.vlad.graphapp.domain.verticesops.strategies.FixedFileStrategy;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.strategies.VertexPopulationStrategy;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.persistence.Persistable;
-
-import java.lang.reflect.Field;
 
 /**
  * Service responsible for populating graph vertices from various sources.
@@ -42,22 +39,8 @@ public class VertexPopulationService {
     public void populateVertices(GraphDomainService graphService,
                                  GraphUiStateService uiStateService,
                                  GraphUiState uiState) {
-        if (strategy instanceof FixedFileStrategy) {
-            try {
-                FixedFileStrategy fixedFileStrategy = (FixedFileStrategy) strategy;
-                Field field = fixedFileStrategy.getClass().getDeclaredField("persistable");
-                field.setAccessible(true);
-                Persistable persistable = (Persistable) field.get(fixedFileStrategy);
-                persistable.loadFromFile(graphService);
-                uiStateService.updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
-            } catch (Exception ex) {
-                System.err.println("Error in direct service-based loading: " + ex.getMessage());
-                ex.printStackTrace();
-                strategy.populate(graphService, uiState);
-            }
-        } else {
-            strategy.populate(graphService, uiState);
-        }
+        strategy.populate(graphService, uiState);
+        uiStateService.updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
         uiState.setAddingVertex(false);
     }
 }
