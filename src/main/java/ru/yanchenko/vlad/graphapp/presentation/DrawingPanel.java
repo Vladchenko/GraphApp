@@ -1,13 +1,12 @@
 package ru.yanchenko.vlad.graphapp.presentation;
 
-import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
-import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.RefreshService;
-import ru.yanchenko.vlad.graphapp.models.ScreenData;
-import ru.yanchenko.vlad.graphapp.models.UiColors;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
+import ru.yanchenko.vlad.graphapp.domain.services.GraphDomainService;
+import ru.yanchenko.vlad.graphapp.infrastructure.contexts.RefreshService;
 import ru.yanchenko.vlad.graphapp.presentation.painter.EdgePainter;
 import ru.yanchenko.vlad.graphapp.presentation.painter.VertexPainter;
+import ru.yanchenko.vlad.graphapp.shared.ScreenData;
+import ru.yanchenko.vlad.graphapp.shared.UiColors;
+import ru.yanchenko.vlad.graphapp.shared.VertexFont;
 
 import javax.swing.*;
 import java.awt.*;

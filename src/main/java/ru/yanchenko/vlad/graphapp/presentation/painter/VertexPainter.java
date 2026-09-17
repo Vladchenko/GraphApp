@@ -1,18 +1,18 @@
 package ru.yanchenko.vlad.graphapp.presentation.painter;
 
-import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
-import ru.yanchenko.vlad.graphapp.models.UiColors;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexFont;
+import ru.yanchenko.vlad.graphapp.domain.entities.Vertex;
+import ru.yanchenko.vlad.graphapp.domain.services.GraphDomainService;
+import ru.yanchenko.vlad.graphapp.presentation.GraphUiState;
+import ru.yanchenko.vlad.graphapp.shared.UiColors;
+import ru.yanchenko.vlad.graphapp.shared.VertexFont;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.util.List;
 
-import static ru.yanchenko.vlad.graphapp.models.UiColors.VERTEX_BACKGROUND_COLORS;
-import static ru.yanchenko.vlad.graphapp.models.UiColors.VERTEX_BACKGROUND_COLORS_FRACTIONS;
+import static ru.yanchenko.vlad.graphapp.shared.UiColors.VERTEX_BACKGROUND_COLORS;
+import static ru.yanchenko.vlad.graphapp.shared.UiColors.VERTEX_BACKGROUND_COLORS_FRACTIONS;
 
 /**
  * Renders graph vertices to a {@link Graphics2D} context.

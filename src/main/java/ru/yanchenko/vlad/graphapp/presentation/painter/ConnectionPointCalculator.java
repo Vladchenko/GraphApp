@@ -1,8 +1,8 @@
 package ru.yanchenko.vlad.graphapp.presentation.painter;
 
-import ru.yanchenko.vlad.graphapp.geometry.Geometry;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
+import ru.yanchenko.vlad.graphapp.domain.entities.Vertex;
+import ru.yanchenko.vlad.graphapp.presentation.GraphUiState;
+import ru.yanchenko.vlad.graphapp.shared.geometry.Geometry;
 
 import java.awt.geom.Point2D;
 
