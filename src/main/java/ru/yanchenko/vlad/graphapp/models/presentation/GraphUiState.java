@@ -1,37 +1,53 @@
 package ru.yanchenko.vlad.graphapp.models.presentation;
 
+import ru.yanchenko.vlad.graphapp.models.domain.Edge;
+import ru.yanchenko.vlad.graphapp.models.vertex.DragPreview;
+import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
+
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Pure UI state data - no operations, only getters and setters.
- * Represents the current state of user interactions and display preferences.
+ * Unified UI state data for the graph presentation layer.
+ * <p>
+ * Combines operation flags, selection state, interaction state,
+ * and transient rendering data (edge being created, drag preview, polar coordinates).
+ * All fields are mutable and updated by user interactions and actions.
  */
 public class GraphUiState {
+    // Selection state
     private int selectedVertexIndex = -1;
     private String editBuffer = "";
+
+    // Operation flags
     private boolean isAddingVertex = false;
     private boolean isEditingVertex = false;
     private boolean isDeletingVertex = false;
-    private Point dragStartPoint;
+
+    // Mouse interaction state
     private Point currentMousePosition;
     private int vertexLinkMargin = 8;
 
-    // Debug mode options
-    private boolean debugMode = false;
-    private boolean showFrameTime = true;
-    private boolean showVertexInfo = false;
-    private boolean showEdgeInfo = false;
-    private boolean showMousePosition = false;
+    // Transient rendering data
+    private Edge edgeBeingCreated;
+    private DragPreview dragPreview;
+    private final List<VertexPolarCoordinate> polarCoordinates;
 
-    // Constructor
+    // Debug mode
+    private boolean debugMode = false;
+
     /**
      * Creates a GraphUiState with default values.
      */
     public GraphUiState() {
-        // Default initialization
+        this.edgeBeingCreated = new Edge(-1, -1);
+        this.dragPreview = new DragPreview();
+        this.polarCoordinates = new ArrayList<>();
     }
 
-    // Selection state
+    //region Selection state
+
     /**
      * Returns the index of the selected vertex.
      *
@@ -46,7 +62,6 @@ public class GraphUiState {
      */
     public void setSelectedVertexIndex(int index) { this.selectedVertexIndex = index; }
 
-    // Edit buffer state
     /**
      * Returns the current edit buffer content.
      *
@@ -61,7 +76,10 @@ public class GraphUiState {
      */
     public void setEditBuffer(String buffer) { this.editBuffer = buffer; }
 
-    // Operation flags
+    //endregion
+
+    //region Operation flags
+
     /**
      * Returns whether vertex addition mode is active.
      *
@@ -104,20 +122,9 @@ public class GraphUiState {
      */
     public void setDeletingVertex(boolean deleting) { this.isDeletingVertex = deleting; }
 
-    // Mouse interaction state
-    /**
-     * Returns the starting point of a drag operation.
-     *
-     * @return the drag start point
-     */
-    public Point getDragStartPoint() { return dragStartPoint; }
+    //endregion
 
-    /**
-     * Sets the starting point of a drag operation.
-     *
-     * @param point the drag start point
-     */
-    public void setDragStartPoint(Point point) { this.dragStartPoint = point; }
+    //region Mouse interaction state
 
     /**
      * Returns the current mouse position.
@@ -133,7 +140,6 @@ public class GraphUiState {
      */
     public void setCurrentMousePosition(Point point) { this.currentMousePosition = point; }
 
-    // Display preferences
     /**
      * Returns the vertex link margin.
      *
@@ -148,7 +154,81 @@ public class GraphUiState {
      */
     public void setVertexLinkMargin(int margin) { this.vertexLinkMargin = margin; }
 
-    // Debug mode
+    //endregion
+
+    //region Transient rendering data
+
+    /**
+     * Returns the edge being created by the user (e.g., via mouse drag).
+     * <p>
+     * The returned {@link Edge} is immutable — to modify it, call
+     * {@link #setEdgeBeingCreated(Edge)} with a new {@code Edge} instance.
+     * A value of {@code Edge(-1, -1)} means no edge is being created.
+     *
+     * @return the edge being created, or {@code Edge(-1, -1)} if none
+     */
+    public Edge getEdgeBeingCreated() { return edgeBeingCreated; }
+
+    /**
+     * Sets the edge being created by the user (e.g., via mouse drag).
+     * <p>
+     * Replaces the previous edge with a new {@link Edge} instance.
+     *
+     * @param edge the edge being created
+     */
+    public void setEdgeBeingCreated(Edge edge) {
+        this.edgeBeingCreated = edge;
+    }
+
+    /**
+     * Returns the drag preview line being drawn by the user.
+     *
+     * @return the drag preview coordinates
+     */
+    public DragPreview getDragPreview() { return dragPreview; }
+
+    /**
+     * Sets the drag preview line being drawn by the user.
+     *
+     * @param dragPreview the drag preview coordinates
+     */
+    public void setDragPreview(DragPreview dragPreview) { this.dragPreview = dragPreview; }
+
+    /**
+     * Returns an unmodifiable copy of the polar coordinates list.
+     *
+     * @return the polar coordinates
+     */
+    public List<VertexPolarCoordinate> getPolarCoordinates() {
+        return new ArrayList<>(polarCoordinates);
+    }
+
+    /**
+     * Replaces the polar coordinates with the specified list.
+     *
+     * @param polarCoordinates the new polar coordinates
+     */
+    public void setPolarCoordinates(List<VertexPolarCoordinate> polarCoordinates) {
+        this.polarCoordinates.clear();
+        this.polarCoordinates.addAll(polarCoordinates);
+    }
+
+    /**
+     * Updates the polar coordinates list to match the number of vertices.
+     *
+     * @param vertices the list of vertices
+     */
+    public void updatePolarCoordinates(List<Vertex> vertices) {
+        this.polarCoordinates.clear();
+        for (int i = 0; i < vertices.size(); i++) {
+            this.polarCoordinates.add(new VertexPolarCoordinate());
+        }
+    }
+
+    //endregion
+
+    //region Debug mode
+
     /**
      * Returns whether debug mode is enabled.
      *
@@ -163,64 +243,10 @@ public class GraphUiState {
      */
     public void setDebugMode(boolean debug) { this.debugMode = debug; }
 
-    // Debug display options
-    /**
-     * Returns whether frame time display is enabled.
-     *
-     * @return true if frame time is shown
-     */
-    public boolean isShowFrameTime() { return showFrameTime; }
+    //endregion
 
-    /**
-     * Sets the frame time display option.
-     *
-     * @param show true to show frame time
-     */
-    public void setShowFrameTime(boolean show) { this.showFrameTime = show; }
+    //region Convenience getters (computed properties)
 
-    /**
-     * Returns whether vertex info display is enabled.
-     *
-     * @return true if vertex info is shown
-     */
-    public boolean isShowVertexInfo() { return showVertexInfo; }
-
-    /**
-     * Sets the vertex info display option.
-     *
-     * @param show true to show vertex info
-     */
-    public void setShowVertexInfo(boolean show) { this.showVertexInfo = show; }
-
-    /**
-     * Returns whether edge info display is enabled.
-     *
-     * @return true if edge info is shown
-     */
-    public boolean isShowEdgeInfo() { return showEdgeInfo; }
-
-    /**
-     * Sets the edge info display option.
-     *
-     * @param show true to show edge info
-     */
-    public void setShowEdgeInfo(boolean show) { this.showEdgeInfo = show; }
-
-    /**
-     * Returns whether mouse position display is enabled.
-     *
-     * @return true if mouse position is shown
-     */
-    public boolean isShowMousePosition() { return showMousePosition; }
-
-    /**
-     * Sets the mouse position display option.
-     *
-     * @param show true to show mouse position
-     */
-    public void setShowMousePosition(boolean show) { this.showMousePosition = show; }
-
-    // Convenience getters (computed properties, still no business logic)
     /**
      * Returns whether a vertex is currently selected.
      *
@@ -234,4 +260,6 @@ public class GraphUiState {
      * @return true if any operation is active
      */
     public boolean isInAnyOperation() { return isAddingVertex || isEditingVertex || isDeletingVertex; }
+
+    //endregion
 }

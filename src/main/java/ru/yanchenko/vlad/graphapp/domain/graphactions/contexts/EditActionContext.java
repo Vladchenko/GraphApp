@@ -1,31 +1,31 @@
 package ru.yanchenko.vlad.graphapp.domain.graphactions.contexts;
 
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiData;
+import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 
 /**
  * Context for edit operations (cancel, confirm).
  */
 public class EditActionContext {
-    private final GraphUiData graphUiData;
+    private final GraphUiState uiState;
     private final RefreshService refreshService;
 
     /**
-     * Creates an EditActionContext with the specified data and service.
+     * Creates an EditActionContext with the specified state and service.
      *
-     * @param graphUiData the graph UI data
+     * @param uiState the graph UI state
      * @param refreshService the refresh service
      */
-    public EditActionContext(GraphUiData graphUiData, RefreshService refreshService) {
-        this.graphUiData = graphUiData;
+    public EditActionContext(GraphUiState uiState, RefreshService refreshService) {
+        this.uiState = uiState;
         this.refreshService = refreshService;
     }
 
     /**
-     * Returns the graph UI data.
+     * Returns the graph UI state.
      *
-     * @return the graph UI data
+     * @return the graph UI state
      */
-    public GraphUiData getGraphUiData() { return graphUiData; }
+    public GraphUiState getUiState() { return uiState; }
 
     /**
      * Returns the refresh service.

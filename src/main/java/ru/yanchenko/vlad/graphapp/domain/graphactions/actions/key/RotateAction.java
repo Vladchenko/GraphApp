@@ -2,7 +2,6 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexRotationService;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.presentation.VertexPolarCoordinate;
 
@@ -50,7 +49,6 @@ public class RotateAction extends GraphAction {
     }
 
     private final Direction direction;
-    private final GraphUiData uiData;
     private final GraphUiState uiState;
     private final GraphDomainService graphService;
     private final VertexRotationService vertexRotationService;
@@ -59,18 +57,15 @@ public class RotateAction extends GraphAction {
      * Creates a RotateAction with the specified parameters.
      *
      * @param direction the rotation direction
-     * @param uiData the UI data
      * @param uiState the UI state
      * @param graphService the graph domain service
      * @param vertexRotationService the vertex rotation service
      */
     public RotateAction(Direction direction,
-                        GraphUiData uiData,
                         GraphUiState uiState,
                         GraphDomainService graphService,
                         VertexRotationService vertexRotationService) {
         super("Rotate " + direction.name().toLowerCase());
-        this.uiData = uiData;
         this.uiState = uiState;
         this.direction = direction;
         this.graphService = graphService;
@@ -84,7 +79,7 @@ public class RotateAction extends GraphAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<VertexPolarCoordinate> polarCoordinates = uiData.getPolarCoordinates();
+        List<VertexPolarCoordinate> polarCoordinates = uiState.getPolarCoordinates();
 
         if (!canRotate()) {
             LOGGER.warning("Cannot rotate - no vertices or operation in progress");

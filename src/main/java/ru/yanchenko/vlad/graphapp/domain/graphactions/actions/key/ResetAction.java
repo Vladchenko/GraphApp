@@ -51,7 +51,7 @@ public class ResetAction extends GraphAction {
             clearUiState();
 
             // Repopulate with initial data using new service architecture
-            vertexPopulationService.populateVertices(context.getGraphService(), context.getUiStateService(), uiState);
+            vertexPopulationService.populateVertices(context.getGraphService(), context.getUiState());
 
             LOGGER.info("Graph reset successfully");
             context.getRefreshService().refresh();
@@ -71,7 +71,7 @@ public class ResetAction extends GraphAction {
     private void clearDomainData() {
         // Clear graph data using the new service architecture
         context.getGraphService().updateGraph(new ru.yanchenko.vlad.graphapp.models.domain.Graph(new java.util.ArrayList<>(), new java.util.ArrayList<>()));
-        context.getUiStateService().getUiData().setPolarCoordinates(new java.util.ArrayList<>());
+        context.getUiState().setPolarCoordinates(new java.util.ArrayList<>());
     }
 
     private void clearUiState() {

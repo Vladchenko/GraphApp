@@ -2,7 +2,6 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.actions.key;
 
 import ru.yanchenko.vlad.graphapp.domain.graphactions.contexts.EditActionContext;
 import ru.yanchenko.vlad.graphapp.models.domain.Edge;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 
 import javax.swing.*;
@@ -76,16 +75,16 @@ public class CancelAction extends GraphAction {
      * Clear domain data state.
      */
     private void clearDomainDataState() {
-        GraphUiData graphUiData = editContext.getGraphUiData();
+        GraphUiState uiState = editContext.getUiState();
 
         // Clear any ongoing edge creation
-        graphUiData.setEdgeBeingCreated(new Edge(-1, -1));
+        uiState.setEdgeBeingCreated(new Edge(-1, -1));
 
         // Clear possible link preview
-        graphUiData.getDragPreview().setX1(-10);
-        graphUiData.getDragPreview().setY1(-10);
-        graphUiData.getDragPreview().setX2(-10);
-        graphUiData.getDragPreview().setY2(-10);
+        uiState.getDragPreview().setX1(-10);
+        uiState.getDragPreview().setY1(-10);
+        uiState.getDragPreview().setX2(-10);
+        uiState.getDragPreview().setY2(-10);
     }
 
     /**

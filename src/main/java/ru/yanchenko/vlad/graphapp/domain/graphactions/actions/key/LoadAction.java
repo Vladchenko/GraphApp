@@ -77,8 +77,8 @@ public class LoadAction extends GraphAction {
      * Initialize polar coordinates for all loaded vertices.
      */
     private void initializePolarCoordinates() {
-        // Update polar coordinates using the UI state service
-        context.getUiStateService().getUiData().updatePolarCoordinates(context.getGraphService().getCurrentGraph().getVertices());
+        // Update polar coordinates using the UI state
+        uiState.updatePolarCoordinates(context.getGraphService().getCurrentGraph().getVertices());
     }
 
     /**

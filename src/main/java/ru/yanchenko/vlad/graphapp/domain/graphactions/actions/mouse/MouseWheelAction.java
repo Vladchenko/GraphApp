@@ -48,7 +48,7 @@ public class MouseWheelAction extends GraphAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<VertexPolarCoordinate> polarCoordinates = context.getUiStateService().getUiData().getPolarCoordinates();
+        List<VertexPolarCoordinate> polarCoordinates = context.getUiState().getPolarCoordinates();
 
         if (!polarCoordinates.isEmpty()) {
             double rotation = mouseWheelEvent.getPreciseWheelRotation(); // or getWheelRotation()

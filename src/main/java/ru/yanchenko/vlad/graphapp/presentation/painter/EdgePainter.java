@@ -4,7 +4,7 @@ import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse.MouseActionManager;
 import ru.yanchenko.vlad.graphapp.models.UiColors;
 import ru.yanchenko.vlad.graphapp.models.domain.Edge;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiData;
+import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
 import ru.yanchenko.vlad.graphapp.models.vertex.DragPreview;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 
@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class EdgePainter {
 
-    private final GraphUiData graphUiData;
+    private final GraphUiState uiState;
     private final GraphDomainService graphService;
     private final MouseActionManager mouseActionManager;
     private final ConnectionPointCalculator connectionPointCalculator;
@@ -33,21 +33,21 @@ public class EdgePainter {
     /**
      * Creates an {@code EdgePainter} with the specified dependencies.
      * <p>
-     * The painter uses {@code graphService} to fetch persistent edges, {@code graphUiData}
+     * The painter uses {@code graphService} to fetch persistent edges, {@code uiState}
      * to read the current edge preview state, {@code mouseActionManager} to determine
      * which mouse button is active (for solid vs dashed line rendering), and
      * {@code connectionPointCalculator} to compute edge endpoints on vertex boundaries.
      *
-     * @param graphUiData               the graph UI data containing edge preview state
+     * @param uiState                   the graph UI state containing edge preview state
      * @param graphService              the graph domain service providing persistent edge data
      * @param mouseActionManager        the mouse action manager for right-button state detection
      * @param connectionPointCalculator the calculator for vertex boundary connection points
      */
-    public EdgePainter(GraphUiData graphUiData,
+    public EdgePainter(GraphUiState uiState,
                        GraphDomainService graphService,
                        MouseActionManager mouseActionManager,
                        ConnectionPointCalculator connectionPointCalculator) {
-        this.graphUiData = graphUiData;
+        this.uiState = uiState;
         this.graphService = graphService;
         this.mouseActionManager = mouseActionManager;
         this.connectionPointCalculator = connectionPointCalculator;
@@ -58,13 +58,13 @@ public class EdgePainter {
      * <p>
      * Renders a solid line with terminators for left-button drag, or a dashed line
      * (no terminators) for right-button drag. The preview state is read from
-     * {@link GraphUiData}. The line style differentiates between adding (solid) and
+     * {@link GraphUiState}. The line style differentiates between adding (solid) and
      * removing (dashed) edges.
      *
      * @param g2 the graphics context to draw on
      */
     public void drawPossibleEdge(Graphics2D g2) {
-        DragPreview link = graphUiData.getDragPreview();
+        DragPreview link = uiState.getDragPreview();
         if (mouseActionManager.isRightMouseButton()) {
             g2.setColor(Color.BLACK);
             float[] dash0 = {5.0f, 15.0f};

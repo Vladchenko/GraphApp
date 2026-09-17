@@ -56,7 +56,7 @@ public class MouseClickAction extends GraphAction {
                     mouseEvent.getX(), mouseEvent.getY()) <= vertex.getRadius()) {
                 // Update UI state for selection
                 uiState.setSelectedVertexIndex(i);
-                context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(i, -1));
+                context.getUiState().setEdgeBeingCreated(new Edge(i, -1));
             }
         }
         context.getRefreshService().refresh();

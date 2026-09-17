@@ -70,6 +70,6 @@ public class AddVertexAction extends GraphAction {
      */
     private void clearSelection() {
         // Clear any ongoing edge creation
-        context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(-1, -1));
+        context.getUiState().setEdgeBeingCreated(new Edge(-1, -1));
     }
 }

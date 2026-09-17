@@ -3,7 +3,6 @@ package ru.yanchenko.vlad.graphapp.domain.verticesops;
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.domain.verticesops.strategies.VertexPopulationStrategy;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.persistence.Persistable;
 
 /**
@@ -33,14 +32,12 @@ public class VertexPopulationService {
      * Populates vertices using the configured strategy.
      *
      * @param graphService   the graph domain service
-     * @param uiStateService the UI state service (used to update polar coordinates)
-     * @param uiState        the UI state (reset to adding mode after load)
+     * @param uiState        the UI state (used to update polar coordinates and reset to adding mode after load)
      */
     public void populateVertices(GraphDomainService graphService,
-                                 GraphUiStateService uiStateService,
                                  GraphUiState uiState) {
         strategy.populate(graphService, uiState);
-        uiStateService.getUiData().updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
+        uiState.updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
         uiState.setAddingVertex(false);
     }
 }

@@ -2,7 +2,6 @@ package ru.yanchenko.vlad.graphapp.domain.graphactions.contexts;
 
 import ru.yanchenko.vlad.graphapp.domain.graph.GraphDomainService;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.persistence.Persistable;
 
 /**
@@ -13,7 +12,6 @@ public class FileActionContext {
     private final RefreshService refreshService;
     private final GraphUiState uiState;
     private final GraphDomainService graphService;
-    private final GraphUiStateService uiStateService;
 
     /**
      * Creates a FileActionContext with the specified services and state.
@@ -22,18 +20,15 @@ public class FileActionContext {
      * @param refreshService the refresh service
      * @param uiState the UI state
      * @param graphService the graph domain service
-     * @param uiStateService the UI state service
      */
     public FileActionContext(Persistable persistable,
                              RefreshService refreshService,
                              GraphUiState uiState,
-                             GraphDomainService graphService,
-                             GraphUiStateService uiStateService) {
+                             GraphDomainService graphService) {
         this.persistable = persistable;
         this.refreshService = refreshService;
         this.uiState = uiState;
         this.graphService = graphService;
-        this.uiStateService = uiStateService;
     }
 
     /**
@@ -63,11 +58,4 @@ public class FileActionContext {
      * @return the graph domain service
      */
     public GraphDomainService getGraphService() { return graphService; }
-
-    /**
-     * Returns the UI state service.
-     *
-     * @return the UI state service
-     */
-    public GraphUiStateService getUiStateService() { return uiStateService; }
 }

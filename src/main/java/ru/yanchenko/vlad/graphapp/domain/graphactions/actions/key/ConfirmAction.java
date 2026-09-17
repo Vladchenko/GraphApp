@@ -7,7 +7,6 @@ import ru.yanchenko.vlad.graphapp.domain.verticesops.VertexLayoutService;
 import ru.yanchenko.vlad.graphapp.models.PopulationKind;
 import ru.yanchenko.vlad.graphapp.models.domain.Graph;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 
 import javax.swing.*;
@@ -57,7 +56,6 @@ public class ConfirmAction extends GraphAction {
     public void actionPerformed(ActionEvent e) {
         // NEW: Use services directly
         GraphDomainService graphService = context.getGraphService();
-        GraphUiStateService uiStateService = context.getUiStateService();
 
         try {
             // Handle vertex editing
@@ -67,7 +65,7 @@ public class ConfirmAction extends GraphAction {
 
             // Handle vertex addition
             if (uiState.isAddingVertex() && !uiState.getEditBuffer().isEmpty()) {
-                confirmVertexAddition(graphService, uiStateService);
+                confirmVertexAddition(graphService);
             }
 
             context.getRefreshService().refresh();
@@ -113,11 +111,11 @@ public class ConfirmAction extends GraphAction {
     /**
      * NEW: Confirm vertex addition using services directly.
      */
-    private void confirmVertexAddition(GraphDomainService graphService, GraphUiStateService uiStateService) {
+    private void confirmVertexAddition(GraphDomainService graphService) {
         String name = sanitize(uiState.getEditBuffer());
 
         vertexCreationService.addVertexAtCenter(name, graphService);
-        uiStateService.getUiData().updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
+        context.getUiState().updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
         uiState.setAddingVertex(false);
         uiState.setEditBuffer("");
         maybeRelayout();

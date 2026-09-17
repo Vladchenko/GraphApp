@@ -18,7 +18,6 @@ import ru.yanchenko.vlad.graphapp.listeners.TextInputListener;
 import ru.yanchenko.vlad.graphapp.models.PopulationKind;
 import ru.yanchenko.vlad.graphapp.models.ScreenData;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiState;
-import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiStateService;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
 import ru.yanchenko.vlad.graphapp.persistence.JsonPersistence;
 import ru.yanchenko.vlad.graphapp.persistence.Persistable;
@@ -166,9 +165,9 @@ public class GraphAppModule {
     @Singleton
     public MouseMotionListener provideMouseMotionListener(DrawingTimer drawingTimer,
                                                           GraphDomainService graphService,
-                                                          GraphUiStateService uiStateService,
+                                                          GraphUiState uiState,
                                                           KeyboardState keyboardState) {
-        return new MouseMotionListenerImpl(drawingTimer, graphService, uiStateService, keyboardState);
+        return new MouseMotionListenerImpl(drawingTimer, graphService, uiState, keyboardState);
     }
 
     @Provides
@@ -182,25 +181,24 @@ public class GraphAppModule {
     public FileActionContext provideFileActionContext(GraphUiState uiState,
                                                       Persistable persistable,
                                                       RefreshService refreshService,
-                                                      GraphDomainService graphService,
-                                                      GraphUiStateService uiStateService) {
-        return new FileActionContext(persistable, refreshService, uiState, graphService, uiStateService);
+                                                      GraphDomainService graphService) {
+        return new FileActionContext(persistable, refreshService, uiState, graphService);
     }
 
     @Provides
     @Singleton
     public GraphActionContext provideGraphActionContext(GraphDomainService graphService,
-                                                        GraphUiStateService uiStateService,
+                                                        GraphUiState uiState,
                                                         RefreshService refreshService,
                                                         PopulationKind populationKind) {
-        return new GraphActionContext(graphService, uiStateService, refreshService, populationKind);
+        return new GraphActionContext(graphService, uiState, refreshService, populationKind);
     }
 
     @Provides
     @Singleton
-    public EditActionContext provideEditActionContext(GraphUiStateService uiStateService,
+    public EditActionContext provideEditActionContext(GraphUiState uiState,
                                                       RefreshService refreshService) {
-        return new EditActionContext(uiStateService.getUiData(), refreshService);
+        return new EditActionContext(uiState, refreshService);
     }
 
     // Action providers
@@ -259,9 +257,8 @@ public class GraphAppModule {
     @Named(ROTATE_CLOCKWISE)
     public RotateAction provideRotateClockwiseAction(GraphUiState uiState,
                                                      GraphDomainService graphService,
-                                                     GraphUiStateService uiStateService,
                                                      VertexRotationService vertexRotationService) {
-        return new RotateAction(RotateAction.Direction.CLOCKWISE, uiStateService.getUiData(), uiState, graphService,
+        return new RotateAction(RotateAction.Direction.CLOCKWISE, uiState, graphService,
                 vertexRotationService);
     }
 
@@ -270,9 +267,8 @@ public class GraphAppModule {
     @Named("rotateCounterClockwise")
     public RotateAction provideRotateCounterClockwiseAction(GraphUiState uiState,
                                                             GraphDomainService graphService,
-                                                            GraphUiStateService uiStateService,
                                                             VertexRotationService vertexRotationService) {
-        return new RotateAction(RotateAction.Direction.COUNTER_CLOCKWISE, uiStateService.getUiData(), uiState,
+        return new RotateAction(RotateAction.Direction.COUNTER_CLOCKWISE, uiState,
                 graphService, vertexRotationService);
     }
 
@@ -322,35 +318,31 @@ public class GraphAppModule {
         return new GraphDomainService();
     }
 
-    @Provides
-    @Singleton
-    public GraphUiStateService provideGraphUiStateService(GraphUiState uiState) {
-        return new GraphUiStateService(uiState);
-    }
+
 
     @Provides
     @Singleton
     public VertexPainter provideVertexPainter(GraphDomainService graphService,
-                                              GraphUiStateService uiStateService,
+                                              GraphUiState uiState,
                                               ConnectionPointCalculator connectionPointCalculator) {
-        return new VertexPainter(connectionPointCalculator, graphService, uiStateService.getUiState());
+        return new VertexPainter(connectionPointCalculator, graphService, uiState);
     }
 
     @Provides
     @Singleton
     public ConnectionPointCalculator provideConnectionPointCalculator(
-            GraphUiStateService uiStateService
+            GraphUiState uiState
     ) {
-        return new ConnectionPointCalculator(uiStateService.getUiState());
+        return new ConnectionPointCalculator(uiState);
     }
 
     @Provides
     @Singleton
     public EdgePainter provideEdgePainter(GraphDomainService graphService,
-                                          GraphUiStateService uiStateService,
+                                          GraphUiState uiState,
                                           MouseActionManager mouseActionManager,
                                           ConnectionPointCalculator connectionPointCalculator) {
-        return new EdgePainter(uiStateService.getUiData(), graphService,
+        return new EdgePainter(uiState, graphService,
                 mouseActionManager, connectionPointCalculator);
     }
 }

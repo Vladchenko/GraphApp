@@ -52,7 +52,7 @@ public class MouseDragAction extends GraphAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
-        Edge currentEdge = context.getUiStateService().getUiData().getEdgeBeingCreated();
+        Edge currentEdge = context.getUiState().getEdgeBeingCreated();
         int chosenVertex = currentEdge.from();
 
         boolean ctrlDown = mouseEvent.isControlDown() || mouseEvent.isMetaDown();
@@ -62,10 +62,10 @@ public class MouseDragAction extends GraphAction {
             vertices.get(chosenVertex).setY(mouseEvent.getY());
             // Reset drag preview to default (negative coordinates) so the previously drawn
             // drag line is not visible when Ctrl is not pressed.
-            context.getUiStateService().getUiData().setDragPreview(defaultDragPreview);
+            context.getUiState().setDragPreview(defaultDragPreview);
         } else if (chosenVertex != -1) {
             // Handle link preview
-            context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(chosenVertex, -1));
+            context.getUiState().setEdgeBeingCreated(new Edge(chosenVertex, -1));
 
             double subjectX1 = vertices.get(currentEdge.from()).getX();
             double subjectY1 = vertices.get(currentEdge.from()).getY();
@@ -75,13 +75,13 @@ public class MouseDragAction extends GraphAction {
                     mouseEvent.getPoint().x, mouseEvent.getPoint().y);
 
             // Set first terminator coordinates
-            context.getUiStateService().getUiData().getDragPreview().setX1(
+            context.getUiState().getDragPreview().setX1(
                     (int) (vertices.get(currentEdge.from()).getX() +
                             Math.cos(angle) * (vertices.get(currentEdge.from()).getRadius() +
                                     uiState.getVertexLinkMargin())) // Use UI state for margin
             );
 
-            context.getUiStateService().getUiData().getDragPreview().setY1(
+            context.getUiState().getDragPreview().setY1(
                     (int) (vertices.get(currentEdge.from()).getY() -
                             Math.sin(angle) * (vertices.get(currentEdge.from()).getRadius() +
                                     uiState.getVertexLinkMargin())) // Use UI state for margin
@@ -92,16 +92,16 @@ public class MouseDragAction extends GraphAction {
                     vertices.get(currentEdge.from()).getRadius() + uiState.getVertexLinkMargin()) {
 
                 // Set second terminator to same as first
-                context.getUiStateService().getUiData().getDragPreview().setX2(
-                        context.getUiStateService().getUiData().getDragPreview().getX1()
+                context.getUiState().getDragPreview().setX2(
+                        context.getUiState().getDragPreview().getX1()
                 );
-                context.getUiStateService().getUiData().getDragPreview().setY2(
-                        context.getUiStateService().getUiData().getDragPreview().getY1()
+                context.getUiState().getDragPreview().setY2(
+                        context.getUiState().getDragPreview().getY1()
                 );
             } else {
                 // Set second terminator to mouse position
-                context.getUiStateService().getUiData().getDragPreview().setX2(mouseEvent.getX());
-                context.getUiStateService().getUiData().getDragPreview().setY2(mouseEvent.getY());
+                context.getUiState().getDragPreview().setX2(mouseEvent.getX());
+                context.getUiState().getDragPreview().setY2(mouseEvent.getY());
             }
 
             // Check for intersection with other vertices
@@ -117,28 +117,28 @@ public class MouseDragAction extends GraphAction {
                                 vertex.getX(), vertex.getY()) + Math.PI;
 
                         // Set second terminator to target vertex
-                        context.getUiStateService().getUiData().getDragPreview().setX2(
+                        context.getUiState().getDragPreview().setX2(
                                 (int) (vertex.getX() + Math.cos(angle2) *
                                         (vertex.getRadius() + uiState.getVertexLinkMargin()))
                         );
 
-                        context.getUiStateService().getUiData().getDragPreview().setY2(
+                        context.getUiState().getDragPreview().setY2(
                                 (int) (vertex.getY() - Math.sin(angle2) *
                                         (vertex.getRadius() + uiState.getVertexLinkMargin()))
                         );
 
                         // Recalculate first terminator for stability
                         angle = Geometry.computeAngle(subjectX1, subjectY1,
-                                context.getUiStateService().getUiData().getDragPreview().getX2(),
-                                context.getUiStateService().getUiData().getDragPreview().getY2());
+                                context.getUiState().getDragPreview().getX2(),
+                                context.getUiState().getDragPreview().getY2());
 
-                        context.getUiStateService().getUiData().getDragPreview().setX1(
+                        context.getUiState().getDragPreview().setX1(
                                 (int) (vertices.get(currentEdge.from()).getX() +
                                         Math.cos(angle) * (vertices.get(currentEdge.from()).getRadius() +
                                                 uiState.getVertexLinkMargin()))
                         );
 
-                        context.getUiStateService().getUiData().getDragPreview().setY1(
+                        context.getUiState().getDragPreview().setY1(
                                 (int) (vertices.get(currentEdge.from()).getY() -
                                         Math.sin(angle) * (vertices.get(currentEdge.from()).getRadius() +
                                                 uiState.getVertexLinkMargin()))
