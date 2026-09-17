@@ -40,7 +40,7 @@ public class VertexPopulationService {
                                  GraphUiStateService uiStateService,
                                  GraphUiState uiState) {
         strategy.populate(graphService, uiState);
-        uiStateService.updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
+        uiStateService.getUiData().updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
         uiState.setAddingVertex(false);
     }
 }

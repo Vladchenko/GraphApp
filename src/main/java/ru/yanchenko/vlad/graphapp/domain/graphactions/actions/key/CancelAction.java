@@ -82,10 +82,10 @@ public class CancelAction extends GraphAction {
         graphUiData.setEdgeBeingCreated(new Edge(-1, -1));
 
         // Clear possible link preview
-        graphUiData.getPossibleLink().setX1(-10);
-        graphUiData.getPossibleLink().setY1(-10);
-        graphUiData.getPossibleLink().setX2(-10);
-        graphUiData.getPossibleLink().setY2(-10);
+        graphUiData.getDragPreview().setX1(-10);
+        graphUiData.getDragPreview().setY1(-10);
+        graphUiData.getDragPreview().setX2(-10);
+        graphUiData.getDragPreview().setY2(-10);
     }
 
     /**

@@ -5,8 +5,8 @@ import ru.yanchenko.vlad.graphapp.domain.graphactions.actions.mouse.MouseActionM
 import ru.yanchenko.vlad.graphapp.models.UiColors;
 import ru.yanchenko.vlad.graphapp.models.domain.Edge;
 import ru.yanchenko.vlad.graphapp.models.presentation.GraphUiData;
+import ru.yanchenko.vlad.graphapp.models.vertex.DragPreview;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -64,7 +64,7 @@ public class EdgePainter {
      * @param g2 the graphics context to draw on
      */
     public void drawPossibleEdge(Graphics2D g2) {
-        VertexPossibleLink link = graphUiData.getPossibleLink();
+        DragPreview link = graphUiData.getDragPreview();
         if (mouseActionManager.isRightMouseButton()) {
             g2.setColor(Color.BLACK);
             float[] dash0 = {5.0f, 15.0f};

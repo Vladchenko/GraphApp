@@ -1,8 +1,8 @@
 package ru.yanchenko.vlad.graphapp.models.presentation;
 
 import ru.yanchenko.vlad.graphapp.models.domain.Edge;
+import ru.yanchenko.vlad.graphapp.models.vertex.DragPreview;
 import ru.yanchenko.vlad.graphapp.models.vertex.Vertex;
-import ru.yanchenko.vlad.graphapp.models.vertex.VertexPossibleLink;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,13 +11,13 @@ import java.util.List;
  * Mutable data container for the presentation layer's graph state.
  * <p>
  * Holds the current edge being created (as an immutable {@link Edge} that is
- * replaced on each modification), a preview of possible links,
- * and polar coordinates for each vertex used in circular layout.
+ * replaced on each modification), a drag preview for the link line being drawn
+ * by the user, and polar coordinates for each vertex used in circular layout.
  */
 public class GraphUiData {
 
     private Edge edgeBeingCreated;
-    private VertexPossibleLink possibleLink;
+    private DragPreview dragPreview;
     private final List<VertexPolarCoordinate> polarCoordinates;
 
     /**
@@ -25,7 +25,7 @@ public class GraphUiData {
      */
     public GraphUiData() {
         this.edgeBeingCreated = new Edge(-1, -1);
-        this.possibleLink = new VertexPossibleLink();
+        this.dragPreview = new DragPreview();
         this.polarCoordinates = new ArrayList<>();
     }
 
@@ -33,14 +33,14 @@ public class GraphUiData {
      * Creates a GraphUiData with the specified values.
      *
      * @param edgeBeingCreated the current edge being created
-     * @param possibleLink the possible link preview
+     * @param dragPreview the drag preview line coordinates
      * @param polarCoordinates the list of polar coordinates for vertices
      */
     public GraphUiData(Edge edgeBeingCreated,
-                       VertexPossibleLink possibleLink,
+                       DragPreview dragPreview,
                        List<VertexPolarCoordinate> polarCoordinates) {
         this.edgeBeingCreated = edgeBeingCreated;
-        this.possibleLink = possibleLink;
+        this.dragPreview = dragPreview;
         this.polarCoordinates = new ArrayList<>(polarCoordinates);
     }
 
@@ -56,11 +56,11 @@ public class GraphUiData {
     public Edge getEdgeBeingCreated() { return edgeBeingCreated; }
 
     /**
-     * Returns the possible link preview.
+     * Returns the drag preview line being drawn by the user.
      *
-     * @return the possible link
+     * @return the drag preview coordinates
      */
-    public VertexPossibleLink getPossibleLink() { return possibleLink; }
+    public DragPreview getDragPreview() { return dragPreview; }
 
     /**
      * Returns an unmodifiable copy of the polar coordinates list.
@@ -83,12 +83,12 @@ public class GraphUiData {
     }
 
     /**
-     * Sets the possible link preview.
+     * Sets the drag preview line being drawn by the user.
      *
-     * @param possibleLink the possible link
+     * @param dragPreview the drag preview coordinates
      */
-    public void setPossibleLink(VertexPossibleLink possibleLink) {
-        this.possibleLink = possibleLink;
+    public void setDragPreview(DragPreview dragPreview) {
+        this.dragPreview = dragPreview;
     }
 
     /**

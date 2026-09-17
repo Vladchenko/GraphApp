@@ -62,7 +62,7 @@ public class ConfirmAction extends GraphAction {
         try {
             // Handle vertex editing
             if (uiState.isEditingVertex() && !uiState.getEditBuffer().isEmpty()) {
-                confirmVertexEditing(graphService, uiStateService);
+                confirmVertexEditing(graphService);
             }
 
             // Handle vertex addition
@@ -87,7 +87,7 @@ public class ConfirmAction extends GraphAction {
     /**
      * NEW: Confirm vertex editing using services directly.
      */
-    private void confirmVertexEditing(GraphDomainService graphService, GraphUiStateService uiStateService) {
+    private void confirmVertexEditing(GraphDomainService graphService) {
         String name = sanitize(uiState.getEditBuffer());
         int index = uiState.getSelectedVertexIndex();
         
@@ -117,7 +117,7 @@ public class ConfirmAction extends GraphAction {
         String name = sanitize(uiState.getEditBuffer());
 
         vertexCreationService.addVertexAtCenter(name, graphService);
-        uiStateService.updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
+        uiStateService.getUiData().updatePolarCoordinates(graphService.getCurrentGraph().getVertices());
         uiState.setAddingVertex(false);
         uiState.setEditBuffer("");
         maybeRelayout();

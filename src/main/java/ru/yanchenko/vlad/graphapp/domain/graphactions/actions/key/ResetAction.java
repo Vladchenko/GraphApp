@@ -71,7 +71,7 @@ public class ResetAction extends GraphAction {
     private void clearDomainData() {
         // Clear graph data using the new service architecture
         context.getGraphService().updateGraph(new ru.yanchenko.vlad.graphapp.models.domain.Graph(new java.util.ArrayList<>(), new java.util.ArrayList<>()));
-        context.getUiStateService().setPolarCoordinates(new java.util.ArrayList<>());
+        context.getUiStateService().getUiData().setPolarCoordinates(new java.util.ArrayList<>());
     }
 
     private void clearUiState() {

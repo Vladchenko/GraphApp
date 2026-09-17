@@ -71,7 +71,7 @@ public class MouseReleaseAction extends GraphAction {
 
                 // Handle link creation/deletion
                 if (currentEdge.from() != i) {
-                    context.getUiStateService().setEdgeBeingCreated(new Edge(currentEdge.from(), i));
+                    context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(currentEdge.from(), i));
 
                     if (isRightMouseButton) {
                         // Remove link using the graph service
@@ -82,7 +82,7 @@ public class MouseReleaseAction extends GraphAction {
                     }
                 } else {
                     // Clear link selection
-                    context.getUiStateService().setEdgeBeingCreated(new Edge(-1, -1));
+                    context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(-1, -1));
                 }
             } else {
                 noVertexChosen++;
@@ -90,17 +90,17 @@ public class MouseReleaseAction extends GraphAction {
 
             // Clear link selection if no second vertex chosen
             if (noVertexChosen == vertices.size()) {
-                context.getUiStateService().setEdgeBeingCreated(new Edge(-1, -1));
+                context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(-1, -1));
             }
         }
 
-        // Reset editing state and clear possible link
+        // Reset editing state and clear drag preview
         uiState.setEditingVertex(false);
-        context.getUiStateService().setEdgeBeingCreated(new Edge(-1, -1));
-        context.getUiStateService().getUiData().getPossibleLink().setX1(-10);
-        context.getUiStateService().getUiData().getPossibleLink().setY1(-10);
-        context.getUiStateService().getUiData().getPossibleLink().setX2(-10);
-        context.getUiStateService().getUiData().getPossibleLink().setY2(-10);
+        context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(-1, -1));
+        context.getUiStateService().getUiData().getDragPreview().setX1(-10);
+        context.getUiStateService().getUiData().getDragPreview().setY1(-10);
+        context.getUiStateService().getUiData().getDragPreview().setX2(-10);
+        context.getUiStateService().getUiData().getDragPreview().setY2(-10);
 
         context.getRefreshService().refresh();
     }

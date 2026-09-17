@@ -22,7 +22,7 @@ public class AddVertexAction extends GraphAction {
      * Creates an AddVertexAction with the specified context and state.
      *
      * @param context the graph action context
-     * @param uiState the UI state
+     * @param uiState the UI state containing editing flags
      */
     public AddVertexAction(GraphActionContext context, GraphUiState uiState) {
         super("Add Vertex");
@@ -69,7 +69,7 @@ public class AddVertexAction extends GraphAction {
      * Clear vertex selection in domain data.
      */
     private void clearSelection() {
-        // Clear any ongoing edge creation using the UI state service
-        context.getUiStateService().setEdgeBeingCreated(new Edge(-1, -1));
+        // Clear any ongoing edge creation
+        context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(-1, -1));
     }
 }

@@ -112,7 +112,7 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
             return;
         }
 
-        uiStateService.setEdgeBeingCreated(new Edge(chosenVertex, -1));
+        uiStateService.getUiData().setEdgeBeingCreated(new Edge(chosenVertex, -1));
 
         Vertex sourceVertex = verticesList.get(currentEdge.from());
         double subjectX1 = sourceVertex.getX();
@@ -144,8 +144,8 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
         int y1 = (int) (sourceVertex.getY() -
                 Math.sin(angle) * (sourceVertex.getRadius() + uiStateService.getUiState().getVertexLinkMargin()));
 
-        uiStateService.getUiData().getPossibleLink().setX1(x1);
-        uiStateService.getUiData().getPossibleLink().setY1(y1);
+        uiStateService.getUiData().getDragPreview().setX1(x1);
+        uiStateService.getUiData().getDragPreview().setY1(y1);
     }
 
     /**
@@ -160,18 +160,18 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      * Set second terminator to same as first.
      */
     private void setSecondTerminatorToFirst() {
-        uiStateService.getUiData().getPossibleLink().setX2(
-                uiStateService.getUiData().getPossibleLink().getX1());
-        uiStateService.getUiData().getPossibleLink().setY2(
-                uiStateService.getUiData().getPossibleLink().getY1());
+        uiStateService.getUiData().getDragPreview().setX2(
+                uiStateService.getUiData().getDragPreview().getX1());
+        uiStateService.getUiData().getDragPreview().setY2(
+                uiStateService.getUiData().getDragPreview().getY1());
     }
 
     /**
      * Set second terminator to mouse position.
      */
     private void setSecondTerminatorToMouse(MouseEvent e) {
-        uiStateService.getUiData().getPossibleLink().setX2(e.getX());
-        uiStateService.getUiData().getPossibleLink().setY2(e.getY());
+        uiStateService.getUiData().getDragPreview().setX2(e.getX());
+        uiStateService.getUiData().getDragPreview().setY2(e.getY());
     }
 
     /**
@@ -211,8 +211,8 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
         int y2 = (int) (targetVertex.getY() -
                 Math.sin(angle) * (targetVertex.getRadius() + uiStateService.getUiState().getVertexLinkMargin()));
 
-        uiStateService.getUiData().getPossibleLink().setX2(x2);
-        uiStateService.getUiData().getPossibleLink().setY2(y2);
+        uiStateService.getUiData().getDragPreview().setX2(x2);
+        uiStateService.getUiData().getDragPreview().setY2(y2);
     }
 
     /**
@@ -220,8 +220,8 @@ public class MouseMotionListenerImpl implements MouseMotionListener {
      */
     private void recalculateFirstTerminator(double subjectX1, double subjectY1, Vertex sourceVertex) {
         double angle = Geometry.computeAngle(subjectX1, subjectY1,
-                uiStateService.getUiData().getPossibleLink().getX2(),
-                uiStateService.getUiData().getPossibleLink().getY2());
+                uiStateService.getUiData().getDragPreview().getX2(),
+                uiStateService.getUiData().getDragPreview().getY2());
 
         setFirstTerminator(sourceVertex, angle);
     }

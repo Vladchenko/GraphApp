@@ -1,12 +1,12 @@
 package ru.yanchenko.vlad.graphapp.models.vertex;
 
 /**
- * Represents a preview of a possible link being drawn by the user.
+ * Represents a drag preview line being drawn by the user.
  * <p>
- * Stores the start and end coordinates of the link preview line
- * during mouse drag operations.
+ * Stores the start and end coordinates of the preview line
+ * during mouse drag operations when creating or removing edges.
  */
-public class VertexPossibleLink {
+public class DragPreview {
 
     private int x1;
     private int y1;
@@ -14,9 +14,9 @@ public class VertexPossibleLink {
     private int y2;
 
     /**
-     * Creates a VertexPossibleLink with default values (-10, -10, -10, -10).
+     * Creates a DragPreview with default values (-10, -10, -10, -10).
      */
-    public VertexPossibleLink() {
+    public DragPreview() {
         this.x1 = -10;
         this.y1 = -10;
         this.x2 = -10;
@@ -24,14 +24,14 @@ public class VertexPossibleLink {
     }
 
     /**
-     * Creates a VertexPossibleLink with the specified coordinates.
+     * Creates a DragPreview with the specified coordinates.
      *
      * @param x1 the x-coordinate of the start point
      * @param y1 the y-coordinate of the start point
      * @param x2 the x-coordinate of the end point
      * @param y2 the y-coordinate of the end point
      */
-    public VertexPossibleLink(int x1, int y1, int x2, int y2) {
+    public DragPreview(int x1, int y1, int x2, int y2) {
         this.x1 = x1;
         this.y1 = y1;
         this.x2 = x2;

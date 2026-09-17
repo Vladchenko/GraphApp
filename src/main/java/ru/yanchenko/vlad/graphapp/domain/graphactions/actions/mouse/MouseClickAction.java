@@ -31,7 +31,7 @@ public class MouseClickAction extends GraphAction {
      *
      * @param context the graph action context
      * @param uiState the UI state
-     * @param mouseEvent the mouse event
+     * @param mouseEvent the mouse event containing click coordinates
      */
     public MouseClickAction(GraphActionContext context, GraphUiState uiState, MouseEvent mouseEvent) {
         super("Mouse Click");
@@ -56,7 +56,7 @@ public class MouseClickAction extends GraphAction {
                     mouseEvent.getX(), mouseEvent.getY()) <= vertex.getRadius()) {
                 // Update UI state for selection
                 uiState.setSelectedVertexIndex(i);
-                context.getUiStateService().setEdgeBeingCreated(new Edge(i, -1));
+                context.getUiStateService().getUiData().setEdgeBeingCreated(new Edge(i, -1));
             }
         }
         context.getRefreshService().refresh();
