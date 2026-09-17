@@ -51,7 +51,6 @@ public class MouseDragAction extends GraphAction {
      */
     @Override
     public void actionPerformed(ActionEvent e) {
-        // NEW: Use services directly instead of legacy VerticesData
         List<Vertex> vertices = context.getGraphService().getCurrentGraph().getVertices();
         Edge currentEdge = context.getUiStateService().getUiData().getEdgeBeingCreated();
         int chosenVertex = currentEdge.from();

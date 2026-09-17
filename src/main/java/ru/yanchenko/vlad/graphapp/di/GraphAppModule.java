@@ -130,19 +130,11 @@ public class GraphAppModule {
         return new VertexLayoutService(layoutStrategy);
     }
 
-    /**
-     * Provides a VertexPopulationStrategyResolver instance.
-     *
-     * @param persistable the persistence service
-     * @param layoutStrategy the layout strategy
-     * @param vertexCreationService the vertex creation service
-     * @return the resolver instance
-     */
     @Provides
     @Singleton
     public VertexPopulationStrategyResolver provideVertexPopulationStrategyResolver(Persistable persistable,
-                                                                                      Consumer<List<Vertex>> layoutStrategy,
-                                                                                      VertexCreationService vertexCreationService) {
+                                                                                    Consumer<List<Vertex>> layoutStrategy,
+                                                                                    VertexCreationService vertexCreationService) {
         return new VertexPopulationStrategyResolver(persistable, layoutStrategy, vertexCreationService);
     }
 
@@ -305,7 +297,7 @@ public class GraphAppModule {
                                               @Named(COUNTER_ROTATE_CLOCKWISE)
                                               RotateAction rotateCounterClockwiseAction) {
         return new ActionManager(loadAction, saveAction, resetAction, cancelAction, confirmAction,
-                rotateClockwiseAction, addVertexAction, editVertexAction,
+                addVertexAction, editVertexAction, rotateClockwiseAction,
                 deleteVertexAction, rotateCounterClockwiseAction);
     }
 

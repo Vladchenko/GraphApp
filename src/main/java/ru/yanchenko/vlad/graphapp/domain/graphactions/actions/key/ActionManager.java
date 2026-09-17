@@ -27,10 +27,10 @@ public class ActionManager {
      * @param saveAction the save action
      * @param resetAction the reset action
      * @param cancelAction the cancel action
-     * @param confirmAction the confirm action
-     * @param rotateClockwiseAction the clockwise rotate action
+     * @param confirmAction the confirmation action
      * @param addVertexAction the add vertex action
      * @param editVertexAction the edit vertex action
+     * @param rotateClockwiseAction the clockwise rotate action
      * @param deleteVertexAction the delete vertex action
      * @param rotateCounterClockwiseAction the counter-clockwise rotate action
      */
@@ -39,9 +39,9 @@ public class ActionManager {
                          ResetAction resetAction,
                          CancelAction cancelAction,
                          ConfirmAction confirmAction,
-                         RotateAction rotateClockwiseAction,
                          AddVertexAction addVertexAction,
                          EditVertexAction editVertexAction,
+                         RotateAction rotateClockwiseAction,
                          DeleteVertexAction deleteVertexAction,
                          RotateAction rotateCounterClockwiseAction) {
 
